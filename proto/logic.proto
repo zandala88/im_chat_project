@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "./proto";
+
+message LoginRequest {
+  string Name = 1;
+  string Password = 2;
+}
+
+message LoginResponse {
+  int64 Code = 1;
+  string AuthToken = 2;
+}
+
+message GetUserInfoRequest {
+  int64 UserId = 1;
+}
+
+message GetUserInfoResponse {
+  int64 Code = 1;
+  int64 UserId = 2;
+  string UserName = 3;
+}
+
+message RegisterRequest {
+  string Name = 1;
+  string Password = 2;
+}
+
+message RegisterResponse {
+  int64 Code = 1;
+  string AuthToken = 2;
+}
+
+message LogoutRequest {
+  string AuthToken = 1;
+}
+
+message LogoutResponse {
+  int64 Code = 1;
+}
+
+message CheckAuthRequest {
+  string AuthToken = 1;
+}
+
+message CheckAuthResponse {
+  int64 Code = 1;
+  int64 UserId = 2;
+  string UserName = 3;
+}
+
+message ConnectRequest {
+  string AuthToken = 1;
+  int64 RoomId = 2;
+  string ServerId = 3;
+}
+
+message ConnectResponse {
+  int64 UserId = 1;
+}
+
+message DisConnectRequest {
+  int64 RoomId = 1;
+  int64 UserId = 2;
+}
+
+message DisConnectResponse {
+  bool Has = 1;
+}
+
+message Send {
+  int64 Code = 1;
+  string Msg = 2;
+  int64 FromUserId = 3;
+  string FromUserName = 4;
+  int64 ToUserId = 5;
+  string ToUserName = 6;
+  int64 RoomId = 7;
+  int64 Op = 8;
+  string CreateTime = 9;
+}
+
+message SendTcp {
+  int64 Code = 1;
+  string Msg = 2;
+  int64 FromUserId = 3;
+  string FromUserName = 4;
+  int64 ToUserId = 5;
+  string ToUserName = 6;
+  int64 RoomId = 7;
+  int64 Op = 8;
+  string CreateTime = 9;
+  string AuthToken = 10;
+}
