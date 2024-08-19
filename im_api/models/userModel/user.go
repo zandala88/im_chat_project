@@ -1,8 +1,9 @@
 package userModel
 
 import (
-	"github.com/astaxie/beego"
+	"errors"
 	"github.com/astaxie/beego/orm"
+	"go.uber.org/zap"
 	"im_api/libs/define"
 	"time"
 )
@@ -37,7 +38,7 @@ func CheckoutUserNameExist(userName string) bool {
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 	user := User{UserName: userName}
 	err := o.Read(&user, "UserName")
-	if err == orm.ErrNoRows {
+	if errors.Is(err, orm.ErrNoRows) {
 		return true
 	}
 	return false
@@ -48,7 +49,7 @@ func GetUserInfoByUserName(userName string) (user User) {
 	o.Using("default") // 默认使用 default，你可以指定为其他数据库
 	user = User{UserName: userName}
 	err := o.Read(&user, "UserName")
-	if err == orm.ErrNoRows {
+	if errors.Is(err, orm.ErrNoRows) {
 		return User{}
 	}
 	return user
@@ -64,7 +65,7 @@ func AddOne(user User) (code int, msg string) {
 	if err != nil {
 		code = define.ERR_MYSQL_EXCEPTION_CODE
 		msg = define.ERR_MYSQL_EXCEPTION_MSG
-		beego.Error("mysql insert err :%v", err)
+		zap.S().Errorf("mysql insert err :%v", err)
 		return
 	}
 	code = define.SUCCESS_CODE

@@ -9,6 +9,8 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/smallnest/rpcx v1.8.31
 	github.com/smartystreets/goconvey v1.8.1
+	go.uber.org/zap v1.27.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
@@ -30,6 +32,7 @@ require (
 	github.com/prometheus/procfs v0.1.3 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

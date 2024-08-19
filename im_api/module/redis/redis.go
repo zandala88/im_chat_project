@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"github.com/astaxie/beego"
 	"github.com/go-redis/redis"
+	"go.uber.org/zap"
 	"im_api/module/config"
 	"time"
 )
@@ -16,11 +16,11 @@ func InitRedis() (err error) {
 	config, err := config.Reader("database.conf")
 	Prefix = config.String("redis::RedisPrefix")
 	if err != nil {
-		beego.Error("config reader err: %v", err)
+		zap.S().Errorf("config reader err: %v", err)
 	}
 	db, err := config.Int("redis::RedisDefaultDB")
 	if err != nil {
-		beego.Error("Redis get db err: %s", err)
+		zap.S().Errorf("Redis get db err: %s", err)
 		return
 	}
 
@@ -29,16 +29,16 @@ func InitRedis() (err error) {
 		Password: config.String("redis::RedisPw"), // no password set
 		DB:       db,                              // use default DB
 	})
-	beego.Debug("redis db %d", db)
+	zap.S().Debugf("redis db %d", db)
 	if pong, err := RedisCli.Ping().Result(); err != nil {
-		beego.Error("RedisCli Ping Result pong: %s,  err: %s", pong, err)
+		zap.S().Errorf("RedisCli Ping Result pong: %s,  err: %s", pong, err)
 
 	}
 	return
 }
 
 func Get(key string) string {
-	beego.Debug("redis get key %s", GetKey(key))
+	zap.S().Debugf("redis get key %s", GetKey(key))
 	return RedisCli.Get(GetKey(key)).Val()
 }
 
@@ -63,7 +63,7 @@ func Delete(key string) error {
 }
 
 func GetKey(key string) string {
-	beego.Debug("redis get Prefix %s", Prefix)
+	zap.S().Debugf("redis get Prefix %s", Prefix)
 	return Prefix + key
 }
 

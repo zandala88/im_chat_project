@@ -2,7 +2,7 @@ package userLogic
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/smallnest/rpcx/log"
+	"go.uber.org/zap"
 	"im_api/libs/define"
 	"im_api/models/userModel"
 	"im_api/module/redis"
@@ -33,13 +33,13 @@ func CheckAuth(auth string) (code int, msg string, ret ReturnInfo) {
 
 	err := redis.InitRedis()
 	if err != nil {
-		beego.Error("redis init  err: %s", err)
+		zap.S().Errorf("redis init  err: %s", err)
 	}
 
 	userInfo, err := redis.HGetAll(auth)
-	log.Debug("userinfo %v", userInfo)
+	zap.S().Debugf("userinfo %v", userInfo)
 	if err != nil {
-		beego.Debug("json err %s", err)
+		zap.S().Debugf("json err %s", err)
 		code = define.ERR_USER_NO_EXIST_CODE
 		msg = define.ERR_USER_NO_EXIST_MSG
 		return
@@ -73,17 +73,17 @@ func Login(user userModel.User) (code int, msg string, RetData ReturnInfo) {
 	userInfo := userModel.GetUserInfoByUserName(user.UserName)
 	// password err
 	if util.Md5(user.Password) != userInfo.Password {
-		beego.Debug("lgin password %s, userinfo %s,", user.Password, userInfo.Password)
+		zap.S().Debugf("login password %s, userinfo %s,", user.Password, userInfo.Password)
 		code = define.ERR_USER_PASSWORD_CODE
 		msg = define.ERR_USER_PASSWORD_MSG
 		return
 	}
 	err := redis.InitRedis()
 	if err != nil {
-		beego.Error("redis init  err: %s", err)
+		zap.S().Errorf("redis init  err: %s", err)
 	}
 	auth := util.GenUuid()
-	beego.Debug("user info %v", userInfo)
+	zap.S().Debugf("user info %v", userInfo)
 	userData := make(map[string]interface{}, 2)
 	userData["UserId"] = userInfo.Id
 	userData["UserName"] = userInfo.UserName
@@ -92,7 +92,7 @@ func Login(user userModel.User) (code int, msg string, RetData ReturnInfo) {
 
 	RetData = ReturnInfo{auth, userInfo.Id, userInfo.UserName}
 	if err != nil {
-		beego.Error("redis set auth err: %s", err)
+		zap.S().Error("redis set auth err: %s", err)
 	}
 
 	code = define.SUCCESS_CODE

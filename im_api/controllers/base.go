@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
+	"go.uber.org/zap"
 	"im_api/libs/define"
 )
 
@@ -28,7 +29,7 @@ func (c *BaseController) RenderData(code int, msg string, data interface{}) (ret
 }
 
 func (c *BaseController) RenderDataSimple(code int, msg string) (retData RetData) {
-	beego.Debug("code %v", code)
+	zap.S().Debugf("code %v", code)
 	retData.Code = code
 	retData.Msg = msg
 	retData.Data = DataNil{}
@@ -43,7 +44,7 @@ func (c *BaseController) CheckParams(dataModel interface{}) (code int, msg strin
 	if err != nil {
 		code = define.ERR_SYSTEM_EXCEPTION_CODE
 		msg = define.ERR_SYSTEM_EXCEPTION_MSG
-		beego.Error("Register Valid err : %v", err)
+		zap.S().Errorf("Register Valid err : %v", err)
 		return
 	}
 	if !b {

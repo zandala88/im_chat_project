@@ -2,9 +2,9 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
+	"go.uber.org/zap"
 	"im_api/module/config"
 
-	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql"
 	"im_api/models/userModel"
 	"strings"
@@ -17,7 +17,7 @@ func init() {
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	config, err := config.Reader("database.conf")
 	if err != nil {
-		beego.Error("config reader err: %v", err)
+		zap.S().Errorf("config reader err: %v", err)
 	}
 
 	host := config.String("mysql::host")
