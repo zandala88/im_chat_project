@@ -14,6 +14,9 @@ fi
 # 切换到 im_api 目录
 cd "$(dirname "$0")/im_api" || { echo "Failed to switch to im_api directory"; exit 1; }
 
-# 运行 bee run
+# 运行 bee run 并将输出重定向到 bee_run.log 文件, 后台运行
 echo "Running bee run in $(pwd)..."
-bee run
+nohup bee run > bee_run.log 2>&1 &
+
+# 输出后台运行的进程ID
+echo "bee run started with PID: $!"
