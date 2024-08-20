@@ -1,22 +1,20 @@
 #!/bin/bash
 
-# 查找占用8081端口的进程ID
-pid=$(lsof -t -i:8081)
+echo "killing process..."
+nc -z localhost 8080
 
-# 如果进程存在，终止该进程
-if [ -n "$pid" ]; then
-  echo "Killing process on port 8081 (PID: $pid)"
-  kill -9 $pid
-else
-  echo "No process is running on port 8081"
+if [ $? -eq 0 ]; then
+    echo "im 存在"
+    kill $(lsof -t -i:8080)
 fi
 
-# 切换到 im_api 目录
-cd "$(dirname "$0")/im_api" || { echo "Failed to switch to im_api directory"; exit 1; }
+current_date=$(date +'%Y-%m-%d-%H:%M:%S')
+sleep 1
+mkdir -p runlog
+echo "running code..."
+nohup go run main.go > "./runlog/$current_date.log" 2>&1 &
+echo "app is running, fetching port info..."
 
-# 运行 bee run 并将输出重定向到 bee_run.log 文件, 后台运行
-echo "Running bee run in $(pwd)..."
-nohup bee run > bee_run.log 2>&1 &
-
-# 输出后台运行的进程ID
-echo "bee run started with PID: $!"
+sleep 2
+echo "port: "
+lsof -i:8080
