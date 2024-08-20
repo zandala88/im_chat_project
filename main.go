@@ -10,6 +10,7 @@ import (
 var Router *gin.Engine
 
 func init() {
+	gin.DisableConsoleColor()
 	Router = gin.Default()
 
 	Router.Use(middleware.Cors())
