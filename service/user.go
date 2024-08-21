@@ -10,7 +10,7 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username"` // 用户名
+	UserName string `json:"userName"` // 用户名
 	Password string `json:"password"` // 密码
 }
 
@@ -19,16 +19,15 @@ type LoginReply struct {
 }
 
 func Login(c *gin.Context) {
-	in := new(LoginRequest)
-	err := c.ShouldBindJSON(in)
-	if err != nil {
+	req := &LoginRequest{}
+	if err := c.ShouldBindJSON(req); err != nil {
 		zap.S().Errorf("[BindJSON ERROR] : %v", err)
 		util.FailResp(c, err.Error())
 		return
 	}
 
 	// 根据用户名查询用户
-	user, err := repo.GetUserByUserName(in.Username)
+	user, err := repo.GetUserByUserName(req.UserName)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			util.FailResp(c, "用户名不存在")
@@ -38,7 +37,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	if user.Password != util.Md5(in.Password) {
+	if user.Password != util.Md5(req.Password) {
 		util.FailResp(c, "密码错误")
 		return
 	}
@@ -57,7 +56,7 @@ func Login(c *gin.Context) {
 }
 
 type RegisterRequest struct {
-	Username string `json:"username"` // 用户名
+	UserName string `json:"userName"` // 用户名
 	Password string `json:"password"` // 密码
 }
 
@@ -66,16 +65,15 @@ type RegisterReply struct {
 }
 
 func Register(c *gin.Context) {
-	in := new(RegisterRequest)
-	err := c.ShouldBindJSON(in)
-	if err != nil {
+	req := &RegisterRequest{}
+	if err := c.ShouldBindJSON(req); err != nil {
 		zap.S().Errorf("[BindJSON ERROR] : %v", err)
 		util.FailResp(c, err.Error())
 		return
 	}
 
 	// 判断用户名是否存在
-	_, err = repo.GetUserByUserName(in.Username)
+	_, err := repo.GetUserByUserName(req.UserName)
 	if err == nil {
 		util.FailResp(c, "用户名已存在")
 		return
@@ -86,7 +84,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 创建账号
-	id, err := repo.CreateUser(in.Username, util.Md5(in.Password))
+	id, err := repo.CreateUser(req.UserName, util.Md5(req.Password))
 	if err != nil {
 		zap.S().Errorf("repo.CreateUser : %v", err)
 		util.FailResp(c, "插入失败")
