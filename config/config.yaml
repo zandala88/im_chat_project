@@ -1,0 +1,23 @@
+Mysql:
+  Username: root
+  Password: 123456
+  Host: 47.113.118.26
+  Port: "3306"
+  Database: "im"
+  Charset: "utf8mb4"
+  ParseTime: "true"
+  IgnoreRecordNotFoundError: true
+  LogLevel: 4
+  SlowThreshold: 2000
+
+Auth:
+  AccessSecret: Axtdd#$%dk_dd8%79D
+  AccessExpire: 2592000
+
+Redis:
+  Addr: 47.113.118.26:6379
+  Password: 123456
+  Db: 0
+  PoolSize: 15
+  MinIdleConns: 10
+  MaxRetries: 2

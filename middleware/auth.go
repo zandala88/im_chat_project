@@ -2,34 +2,43 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"im/model"
-	"im/service"
 	"im/util"
+	"net/http"
+	"strings"
 )
 
 func Auth() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		token := ctx.Query("token")
-		if token == "" || len(token) == 0 {
-			h := util.Response{
-				Code:    403,
-				Message: "用户未登录",
-			}
-			h.Fail(ctx.Writer)
+	return func(c *gin.Context) {
+		authHeader := c.Request.Header.Get("token")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 2003,
+				"msg":  "请求头中auth为空",
+			})
+			c.Abort()
 			return
 		}
-		// 获取用户
-		user := model.User{}
-		service.DbEngine.Where("token = ?", token).First(&user)
-		if user.ID == 0 {
-			h := util.Response{
-				Code:    403,
-				Message: "无效的 token",
-			}
-			h.Fail(ctx.Writer)
+		// 按空格分割
+		parts := strings.Split(authHeader, ".")
+		if len(parts) != 3 {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 2004,
+				"msg":  "请求头中auth格式有误",
+			})
+			c.Abort()
 			return
 		}
-		ctx.Set("auth", user)
-		ctx.Next()
+		mc, err := util.VerifyJWT(authHeader)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 2005,
+				"msg":  "无效的Token",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Set("id", mc.Id)
+		c.Next()
 	}
 }
