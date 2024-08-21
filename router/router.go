@@ -22,8 +22,8 @@ func Router() *gin.Engine {
 
 	api := r.Group("/", middleware.Auth())
 	{
-		api.POST("friend", service.AddFriend)
-		api.GET("friend/:friendId", service.GetFriend)
+		api.POST("add/friend", service.AddFriend)
+		api.GET("get/friend", service.GetFriend)
 		//api.GET("friends", service.GetFriends)
 		//api.DELETE("friend", service.DeleteFriend)
 	}

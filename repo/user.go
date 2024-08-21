@@ -18,7 +18,7 @@ type User struct {
 func GetUserByUserName(username string) (*User, error) {
 	db := public.Db
 	data := &User{}
-	err := db.Where("username", username).First(&data).Error
+	err := db.Where("user_name", username).First(&data).Error
 	return data, err
 }
 

@@ -16,6 +16,14 @@ type AddFriendRequest struct {
 type AddFriendReply struct {
 }
 
+// AddFriend
+// @Tags 好友
+// @Summary 添加好友
+// @accept json
+// @Produce  json
+// @Param friend body AddFriendRequest true "添加好友"
+// @Success 200 {object} AddFriendReply
+// @Router /add/friend [post]
 func AddFriend(c *gin.Context) {
 	req := &AddFriendRequest{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -67,6 +75,14 @@ type GetFriendReply struct {
 	Mobile   string `json:"mobile"`
 }
 
+// GetFriend
+// @Tags 好友
+// @Summary 好友信息
+// @accept json
+// @Produce  json
+// @Param friend query GetFriendRequest true "好友信息"
+// @Success 200 {object} GetFriendReply
+// @Router /get/friend [get]
 func GetFriend(c *gin.Context) {
 	req := &GetFriendRequest{}
 	if err := c.ShouldBindQuery(req); err != nil {

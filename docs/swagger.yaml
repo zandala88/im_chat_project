@@ -1,0 +1,136 @@
+definitions:
+  service.AddFriendReply:
+    type: object
+  service.AddFriendRequest:
+    properties:
+      friendId:
+        type: integer
+    type: object
+  service.GetFriendReply:
+    properties:
+      mobile:
+        type: string
+      username:
+        type: string
+    type: object
+  service.LoginReply:
+    properties:
+      token:
+        description: token
+        type: string
+    type: object
+  service.LoginRequest:
+    properties:
+      password:
+        description: 密码
+        type: string
+      userName:
+        description: 用户名
+        type: string
+    required:
+    - password
+    - userName
+    type: object
+  service.RegisterReply:
+    properties:
+      token:
+        description: token
+        type: string
+    type: object
+  service.RegisterRequest:
+    properties:
+      password:
+        description: 密码
+        type: string
+      userName:
+        description: 用户名
+        type: string
+    required:
+    - password
+    - userName
+    type: object
+info:
+  contact: {}
+paths:
+  /add/friend:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 添加好友
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/service.AddFriendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.AddFriendReply'
+      summary: 添加好友
+      tags:
+      - 好友
+  /get/friend:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: friendId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GetFriendReply'
+      summary: 好友信息
+      tags:
+      - 好友
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户登录
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.LoginReply'
+      summary: 用户登录
+      tags:
+      - 用户
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户注册
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.RegisterReply'
+      summary: 用户注册
+      tags:
+      - 用户
+swagger: "2.0"

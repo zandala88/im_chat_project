@@ -10,14 +10,22 @@ import (
 )
 
 type LoginRequest struct {
-	UserName string `json:"userName"` // 用户名
-	Password string `json:"password"` // 密码
+	UserName string `json:"userName" binding:"required"` // 用户名
+	Password string `json:"password" binding:"required"` // 密码
 }
 
 type LoginReply struct {
 	Token string `json:"token"` // token
 }
 
+// Login
+// @Tags 用户
+// @Summary 用户登录
+// @accept json
+// @Produce  json
+// @Param user body LoginRequest true "用户登录"
+// @Success 200 {object} LoginReply
+// @Router /user/login [post]
 func Login(c *gin.Context) {
 	req := &LoginRequest{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -56,14 +64,22 @@ func Login(c *gin.Context) {
 }
 
 type RegisterRequest struct {
-	UserName string `json:"userName"` // 用户名
-	Password string `json:"password"` // 密码
+	UserName string `json:"userName" binding:"required"` // 用户名
+	Password string `json:"password" binding:"required"` // 密码
 }
 
 type RegisterReply struct {
 	Token string `json:"token"` // token
 }
 
+// Register
+// @Tags 用户
+// @Summary 用户注册
+// @accept json
+// @Produce  json
+// @Param user body RegisterRequest true "用户注册"
+// @Success 200 {object} RegisterReply
+// @Router /user/register [post]
 func Register(c *gin.Context) {
 	req := &RegisterRequest{}
 	if err := c.ShouldBindJSON(req); err != nil {
