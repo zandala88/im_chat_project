@@ -77,11 +77,11 @@ type GetFriendReply struct {
 
 // GetFriend
 // @Tags 好友
-// @Summary 好友信息
+// @Summary 好友列表
 // @accept json
 // @Produce  json
-// @Param friend query GetFriendRequest true "好友信息"
-// @Success 200 {object} GetFriendReply
+// @Param friend body AddFriendRequest true "好友列表"
+// @Success 200 {object} AddFriendReply
 // @Router /get/friend [get]
 func GetFriend(c *gin.Context) {
 	req := &GetFriendRequest{}
@@ -102,4 +102,51 @@ func GetFriend(c *gin.Context) {
 		UserName: user.UserName,
 		Mobile:   user.Mobile,
 	})
+}
+
+type GetFriendListRequest struct {
+}
+
+type GetFriendListReply struct {
+	List []*GetFriendListSimple `json:"list"`
+}
+
+type GetFriendListSimple struct {
+	Id     int64  `json:"id"`
+	Avatar string `json:"avatar"`
+}
+
+// GetFriendList
+// @Tags 好友
+// @Summary 好友信息
+// @accept json
+// @Produce  json
+// @Param friend query GetFriendListRequest true "好友列表"
+// @Success 200 {object} GetFriendListReply
+// @Router /get/friend/list [get]
+func GetFriendList(c *gin.Context) {
+	userId := util.GetUid(c)
+	idList, err := repo.GetFriendList(userId)
+	if err != nil {
+		zap.S().Errorf("repo.GetFriendList : %v", err)
+		util.FailResp(c, "查询失败")
+		return
+	}
+
+	userList, err := repo.GetUserByUserIds(idList)
+	if err != nil {
+		zap.S().Errorf("repo.GetUserByUserIds : %v", err)
+		util.FailResp(c, "查询失败")
+		return
+	}
+
+	data := &GetFriendListReply{}
+	for _, user := range userList {
+		data.List = append(data.List, &GetFriendListSimple{
+			Id: user.Id,
+		})
+
+	}
+
+	util.SuccessResp(c, data)
 }

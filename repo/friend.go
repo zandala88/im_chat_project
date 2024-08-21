@@ -35,3 +35,10 @@ func AddFriendCreate(userId, friendId int64) error {
 	})
 	return err
 }
+
+func GetFriendList(userId int64) ([]int64, error) {
+	db := public.Db
+	var data []int64
+	err := db.Select("friend_id").Where("user_id", userId).Scan(&data).Error
+	return data, err
+}

@@ -29,6 +29,13 @@ func GetUserByUserId(userId int64) (*User, error) {
 	return data, err
 }
 
+func GetUserByUserIds(userId []int64) ([]*User, error) {
+	db := public.Db
+	var data []*User
+	err := db.Where("id IN", userId).Find(&data).Error
+	return data, err
+}
+
 func CreateUser(username, password string) (int64, error) {
 	db := public.Db
 	data := &User{

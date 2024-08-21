@@ -24,7 +24,7 @@ func Router() *gin.Engine {
 	{
 		api.POST("add/friend", service.AddFriend)
 		api.GET("get/friend", service.GetFriend)
-		//api.GET("friends", service.GetFriends)
+		api.GET("get/friend/list", service.GetFriends)
 		//api.DELETE("friend", service.DeleteFriend)
 	}
 	return r
