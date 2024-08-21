@@ -3,6 +3,8 @@ package util
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"im/config"
 	"time"
 )
@@ -39,4 +41,12 @@ func VerifyJWT(tokenString string) (*MyClaims, error) {
 		return claims, nil
 	}
 	return nil, errors.New("invalid token")
+}
+
+func GetUid(c *gin.Context) int64 {
+	value, exists := c.Get("id")
+	if exists {
+		zap.S().Info("ctx获取userId失败")
+	}
+	return value.(int64)
 }

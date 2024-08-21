@@ -43,7 +43,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 生成 token
-	token, err := util.GenerateJWT(int64(user.ID))
+	token, err := util.GenerateJWT(user.Id)
 	if err != nil {
 		zap.S().Errorf("[BindJSON ERROR] : %v", err)
 		util.FailResp(c, err.Error())
@@ -92,7 +92,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 生成 token
-	token, err := util.GenerateJWT(int64(id))
+	token, err := util.GenerateJWT(id)
 	if err != nil {
 		zap.S().Errorf("util.GenerateJWT : %v", err)
 		util.FailResp(c, err.Error())

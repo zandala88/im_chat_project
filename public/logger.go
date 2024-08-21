@@ -76,7 +76,7 @@ func (l *CustomLogger) Trace(ctx context.Context, begin time.Time, fc func() (sq
 
 	switch {
 	case err != nil && l.logLevel >= logger.Error:
-		//zap.S().Errorf("err: %v | elapsed: %v | sql: %s | rows: %d", err, elapsed, sql, rows)
+		zap.S().Errorf("err: %v | elapsed: %v | sql: %s | rows: %d", err, elapsed, sql, rows)
 	case elapsed > l.slowThreshold && l.slowThreshold != 0 && l.logLevel >= logger.Warn:
 		zap.S().Infof("elapsed: %v | slow sql: %s | rows: %d", elapsed, sql, rows)
 	case l.logLevel >= logger.Info:
