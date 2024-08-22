@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	//public.Db.AutoMigrate(&repo.User{}, &repo.Contact{})
+	//public.Db.AutoMigrate(&repo.User{}, &repo.Contact{}, &repo.CommunityUsers{}, &repo.Community{}, &repo.Message{})
 	router.Router().Run(":8080")
 }

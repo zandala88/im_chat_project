@@ -6,15 +6,19 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "im/docs"
 	"im/middleware"
+	"im/public"
 	"im/service"
+	"io"
 )
 
 func Router() *gin.Engine {
-	r := gin.Default()
-	r.Use(middleware.Cors())
-
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = io.Discard
 	gin.DisableConsoleColor()
-	r.Use(middleware.Cors())
+
+	r := gin.Default()
+	r.Use(middleware.Cors(), public.GinLogger(), public.GinRecovery())
+
 	// Swagger 配置
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
