@@ -21,6 +21,7 @@ type AddFriendReply struct {
 // @Summary 添加好友
 // @accept json
 // @Produce  json
+// @Param token header string true "token"
 // @Param friend body AddFriendRequest true "添加好友"
 // @Success 200 {object} AddFriendReply
 // @Router /add/friend [post]
@@ -81,6 +82,7 @@ type GetFriendReply struct {
 // @accept json
 // @Produce  json
 // @Param friend body AddFriendRequest true "好友列表"
+// @Param token header string true "token"
 // @Success 200 {object} AddFriendReply
 // @Router /get/friend [get]
 func GetFriend(c *gin.Context) {
@@ -122,6 +124,7 @@ type GetFriendListSimple struct {
 // @accept json
 // @Produce  json
 // @Param friend body GetFriendListRequest true "好友列表"
+// @Param token header string true "token"
 // @Success 200 {object} GetFriendListReply
 // @Router /get/friend/list [get]
 func GetFriendList(c *gin.Context) {
