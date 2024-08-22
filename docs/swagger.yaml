@@ -6,12 +6,21 @@ definitions:
       friendId:
         type: integer
     type: object
-  service.GetFriendReply:
+  service.GetFriendListReply:
     properties:
-      mobile:
+      list:
+        items:
+          $ref: '#/definitions/service.GetFriendListSimple'
+        type: array
+    type: object
+  service.GetFriendListRequest:
+    type: object
+  service.GetFriendListSimple:
+    properties:
+      avatar:
         type: string
-      username:
-        type: string
+      id:
+        type: integer
     type: object
   service.LoginReply:
     properties:
@@ -57,6 +66,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       - description: 添加好友
         in: body
         name: friend
@@ -78,17 +92,51 @@ paths:
       consumes:
       - application/json
       parameters:
-      - in: query
-        name: friendId
-        type: integer
+      - description: 好友信息
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/service.AddFriendRequest'
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GetFriendReply'
+            $ref: '#/definitions/service.AddFriendReply'
       summary: 好友信息
+      tags:
+      - 好友
+  /get/friend/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 好友列表
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/service.GetFriendListRequest'
+      - description: token
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GetFriendListReply'
+      summary: 好友列表
       tags:
       - 好友
   /user/login:

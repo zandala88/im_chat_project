@@ -2,6 +2,9 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "im/docs"
 	"im/middleware"
 	"im/service"
 )
@@ -11,8 +14,9 @@ func Router() *gin.Engine {
 	r.Use(middleware.Cors())
 
 	gin.DisableConsoleColor()
-
 	r.Use(middleware.Cors())
+	// Swagger 配置
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	r.Group("/")
 	{

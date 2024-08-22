@@ -78,10 +78,10 @@ type GetFriendReply struct {
 
 // GetFriend
 // @Tags 好友
-// @Summary 好友列表
+// @Summary 好友信息
 // @accept json
 // @Produce  json
-// @Param friend body AddFriendRequest true "好友列表"
+// @Param friend body AddFriendRequest true "好友信息"
 // @Param token header string true "token"
 // @Success 200 {object} AddFriendReply
 // @Router /get/friend [get]
@@ -120,7 +120,7 @@ type GetFriendListSimple struct {
 
 // GetFriendList
 // @Tags 好友
-// @Summary 好友信息
+// @Summary 好友列表
 // @accept json
 // @Produce  json
 // @Param friend body GetFriendListRequest true "好友列表"

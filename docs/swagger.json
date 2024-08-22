@@ -18,6 +18,13 @@
                 "summary": "添加好友",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "添加好友",
                         "name": "friend",
                         "in": "body",
@@ -51,16 +58,67 @@
                 "summary": "好友信息",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "name": "friendId",
-                        "in": "query"
+                        "description": "好友信息",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.AddFriendRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GetFriendReply"
+                            "$ref": "#/definitions/service.AddFriendReply"
+                        }
+                    }
+                }
+            }
+        },
+        "/get/friend/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "好友"
+                ],
+                "summary": "好友列表",
+                "parameters": [
+                    {
+                        "description": "好友列表",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.GetFriendListRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.GetFriendListReply"
                         }
                     }
                 }
@@ -145,14 +203,28 @@
                 }
             }
         },
-        "service.GetFriendReply": {
+        "service.GetFriendListReply": {
             "type": "object",
             "properties": {
-                "mobile": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.GetFriendListSimple"
+                    }
+                }
+            }
+        },
+        "service.GetFriendListRequest": {
+            "type": "object"
+        },
+        "service.GetFriendListSimple": {
+            "type": "object",
+            "properties": {
+                "avatar": {
                     "type": "string"
                 },
-                "username": {
-                    "type": "string"
+                "id": {
+                    "type": "integer"
                 }
             }
         },
