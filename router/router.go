@@ -24,8 +24,11 @@ func Router() *gin.Engine {
 	{
 		api.POST("add/friend", service.AddFriend)
 		api.GET("get/friend", service.GetFriend)
-		api.GET("get/friend/list", service.GetFriends)
+		api.GET("get/friend/list", service.GetFriendList)
 		//api.DELETE("friend", service.DeleteFriend)
+
+		// chat
+		api.GET("/chat", service.Chat)
 	}
 	return r
 }

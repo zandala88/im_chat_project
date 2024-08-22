@@ -85,7 +85,7 @@ type GetFriendReply struct {
 // @Router /get/friend [get]
 func GetFriend(c *gin.Context) {
 	req := &GetFriendRequest{}
-	if err := c.ShouldBindQuery(req); err != nil {
+	if err := c.ShouldBindJSON(req); err != nil {
 		zap.S().Errorf("[BindQuery ERROR] : %v", err)
 		util.FailResp(c, err.Error())
 		return
@@ -121,7 +121,7 @@ type GetFriendListSimple struct {
 // @Summary 好友信息
 // @accept json
 // @Produce  json
-// @Param friend query GetFriendListRequest true "好友列表"
+// @Param friend body GetFriendListRequest true "好友列表"
 // @Success 200 {object} GetFriendListReply
 // @Router /get/friend/list [get]
 func GetFriendList(c *gin.Context) {
