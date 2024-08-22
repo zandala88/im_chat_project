@@ -13,7 +13,7 @@ func Auth() gin.HandlerFunc {
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 2003,
-				"msg":  "请求头中auth为空",
+				"msg":  "没有token,请重新登录",
 			})
 			c.Abort()
 			return
@@ -23,7 +23,7 @@ func Auth() gin.HandlerFunc {
 		if len(parts) != 3 {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 2004,
-				"msg":  "请求头中auth格式有误",
+				"msg":  "token错误",
 			})
 			c.Abort()
 			return
