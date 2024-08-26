@@ -94,7 +94,18 @@ func GetFriend(c *gin.Context) {
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
-	// todo 判断是不是他的好友
+	userId := util.GetUid(c)
+
+	_, err := repo.GetOneContact(userId, req.FriendId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			zap.S().Errorf("用户%d尝试查询好友%d", userId, req.FriendId)
+			util.FailResp(c, "不是你的好友")
+		}
+		zap.S().Errorf("repo.GetOneContact : %v", err)
+		util.FailRespWithCode(c, util.CURDSelectError)
+		return
+	}
 
 	user, err := repo.GetUserByUserId(req.FriendId)
 	if err != nil {
