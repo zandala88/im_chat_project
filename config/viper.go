@@ -10,6 +10,7 @@ type Config struct {
 	MySQL MySQLConfig
 	Redis RedisConfig
 	Auth  AuthConfig
+	Email EmailConfig
 }
 
 type MySQLConfig struct {
@@ -38,6 +39,12 @@ type RedisConfig struct {
 	PoolSize     int
 	MinIdleConns int
 	MaxRetries   int
+}
+
+type EmailConfig struct {
+	Service string
+	Addr    string
+	Key     string
 }
 
 func init() {

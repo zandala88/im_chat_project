@@ -7,6 +7,7 @@ import (
 
 type User struct {
 	Id        int64     `json:"id"`
+	Email     string    `gorm:"column:email;type:varchar(50);" json:"email"`
 	UserName  string    `gorm:"column:user_name;type:varchar(50);" json:"username"`
 	Password  string    `gorm:"column:password;type:varchar(36);" json:"password"`
 	Mobile    string    `gorm:"column:mobile;type:varchar(20);" json:"mobile"`
@@ -15,10 +16,10 @@ type User struct {
 	DeletedAt time.Time `gorm:"default:null" json:"deleted_at"`
 }
 
-func GetUserByUserName(username string) (*User, error) {
+func GetUserByEmail(email string) (*User, error) {
 	db := public.Db
 	data := &User{}
-	err := db.Where("user_name", username).First(&data).Error
+	err := db.Where("email", email).First(&data).Error
 	return data, err
 }
 
@@ -32,16 +33,12 @@ func GetUserByUserId(userId int64) (*User, error) {
 func GetUserByUserIds(userId []int64) ([]*User, error) {
 	db := public.Db
 	var data []*User
-	err := db.Where("id IN", userId).Find(&data).Error
+	err := db.Where("id IN ?", userId).Find(&data).Error
 	return data, err
 }
 
-func CreateUser(username, password string) (int64, error) {
+func CreateUser(user *User) (int64, error) {
 	db := public.Db
-	data := &User{
-		UserName: username,
-		Password: password,
-	}
-	err := db.Create(&data).Error
-	return data.Id, err
+	err := db.Create(&user).Error
+	return user.Id, err
 }

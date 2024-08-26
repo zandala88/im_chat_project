@@ -21,3 +21,8 @@ Redis:
   PoolSize: 15
   MinIdleConns: 10
   MaxRetries: 2
+
+Email:
+  Service: smtp.163.com
+  Addr: licehai5114141@163.com
+  Key: HUPGSBWAWNLDJLAW

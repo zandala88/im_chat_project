@@ -69,13 +69,9 @@ const docTemplate = `{
                 "summary": "好友信息",
                 "parameters": [
                     {
-                        "description": "好友信息",
-                        "name": "friend",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/service.AddFriendRequest"
-                        }
+                        "type": "integer",
+                        "name": "friendId",
+                        "in": "query"
                     },
                     {
                         "type": "string",
@@ -108,15 +104,6 @@ const docTemplate = `{
                 ],
                 "summary": "好友列表",
                 "parameters": [
-                    {
-                        "description": "好友列表",
-                        "name": "friend",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/service.GetFriendListRequest"
-                        }
-                    },
                     {
                         "type": "string",
                         "description": "token",
@@ -200,6 +187,37 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/register/code": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "summary": "用户注册获取验证码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "邮箱",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.GetCodeReply"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -214,6 +232,9 @@ const docTemplate = `{
                 }
             }
         },
+        "service.GetCodeReply": {
+            "type": "object"
+        },
         "service.GetFriendListReply": {
             "type": "object",
             "properties": {
@@ -224,9 +245,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "service.GetFriendListRequest": {
-            "type": "object"
         },
         "service.GetFriendListSimple": {
             "type": "object",
@@ -251,16 +269,16 @@ const docTemplate = `{
         "service.LoginRequest": {
             "type": "object",
             "required": [
-                "password",
-                "userName"
+                "email",
+                "password"
             ],
             "properties": {
-                "password": {
-                    "description": "密码",
+                "email": {
+                    "description": "邮箱",
                     "type": "string"
                 },
-                "userName": {
-                    "description": "用户名",
+                "password": {
+                    "description": "密码",
                     "type": "string"
                 }
             }
@@ -277,10 +295,20 @@ const docTemplate = `{
         "service.RegisterRequest": {
             "type": "object",
             "required": [
+                "code",
+                "email",
                 "password",
                 "userName"
             ],
             "properties": {
+                "code": {
+                    "description": "验证码",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
                 "password": {
                     "description": "密码",
                     "type": "string"

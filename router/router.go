@@ -26,6 +26,7 @@ func Router() *gin.Engine {
 	{
 		r.POST("user/login", service.Login)
 		r.POST("user/register", service.Register)
+		r.GET("user/register/code", service.GetCode)
 		// chat
 		r.GET("/chat", service.Chat)
 	}

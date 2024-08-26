@@ -6,14 +6,14 @@ definitions:
       friendId:
         type: integer
     type: object
+  service.GetCodeReply:
+    type: object
   service.GetFriendListReply:
     properties:
       list:
         items:
           $ref: '#/definitions/service.GetFriendListSimple'
         type: array
-    type: object
-  service.GetFriendListRequest:
     type: object
   service.GetFriendListSimple:
     properties:
@@ -30,15 +30,15 @@ definitions:
     type: object
   service.LoginRequest:
     properties:
+      email:
+        description: 邮箱
+        type: string
       password:
         description: 密码
         type: string
-      userName:
-        description: 用户名
-        type: string
     required:
+    - email
     - password
-    - userName
     type: object
   service.RegisterReply:
     properties:
@@ -48,6 +48,12 @@ definitions:
     type: object
   service.RegisterRequest:
     properties:
+      code:
+        description: 验证码
+        type: string
+      email:
+        description: 邮箱
+        type: string
       password:
         description: 密码
         type: string
@@ -55,6 +61,8 @@ definitions:
         description: 用户名
         type: string
     required:
+    - code
+    - email
     - password
     - userName
     type: object
@@ -92,12 +100,9 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 好友信息
-        in: body
-        name: friend
-        required: true
-        schema:
-          $ref: '#/definitions/service.AddFriendRequest'
+      - in: query
+        name: friendId
+        type: integer
       - description: token
         in: header
         name: token
@@ -118,12 +123,6 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 好友列表
-        in: body
-        name: friend
-        required: true
-        schema:
-          $ref: '#/definitions/service.GetFriendListRequest'
       - description: token
         in: header
         name: token
@@ -179,6 +178,26 @@ paths:
           schema:
             $ref: '#/definitions/service.RegisterReply'
       summary: 用户注册
+      tags:
+      - 用户
+  /user/register/code:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.GetCodeReply'
+      summary: 用户注册获取验证码
       tags:
       - 用户
 swagger: "2.0"
