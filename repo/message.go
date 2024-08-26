@@ -12,10 +12,10 @@ const (
 )
 
 type Message struct {
-	ID        int       `json:"id,omitempty" form:"id"`           // 消息 id
-	UserId    uint      `json:"user_id,omitempty" form:"userid"`  // 发送者用户 id
+	Id        int       `json:"id,omitempty" form:"id"`           // 消息 id
+	UserId    uint      `json:"userId,omitempty" form:"userId"`   // 发送者用户 id
 	Cmd       int       `json:"cmd,omitempty" form:"cmd"`         // 群聊还是私聊
-	ToId      int       `json:"to_id omitempty" form:"to_id"`     //对端 id 或者群聊 id
+	ToId      int       `json:"toId,omitempty" form:"toId"`       //对端 id 或者群聊 id
 	Media     uint      `json:"media,omitempty" form:"media"`     // 消息样式
 	Content   string    `json:"content,omitempty" form:"content"` // 消息的内容
 	Pic       string    `json:"pic,omitempty" form:"pic"`         // 图片预览
@@ -24,7 +24,7 @@ type Message struct {
 	Amount    int       `json:"amount,omitempty" form:"amount"`   // 和数字相关
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt time.Time `gorm:"default:null" json:"deleted_at"`
+	DeletedAt time.Time `gorm:"default:null" json:"deletedAt"`
 }
 
 func SaveMessage(message Message) {

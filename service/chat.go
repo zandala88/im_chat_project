@@ -62,6 +62,7 @@ func Chat(c *gin.Context) {
 	}
 
 	rwLocker.Lock()
+	zap.S().Debugf("用户%d 上线", userId)
 	clientMap[userId] = node
 	rwLocker.Unlock()
 
@@ -111,6 +112,7 @@ func sendMsg(userId int64, data []byte) {
 	rwLocker.Unlock()
 
 	if ok {
+		zap.S().Debugf("sendMsg data = %v", string(data))
 		node.DataQueue <- data
 	}
 }
@@ -124,7 +126,7 @@ func dispatch(data []byte) {
 		zap.S().Errorf("json.Unmarshal err=%v", err)
 		return
 	}
-	zap.S().Debugf("收到了数据 %v", message)
+	zap.S().Debugf("收到了数据 %v", string(data))
 	//保存数据库
 	go repo.SaveMessage(message)
 
@@ -132,6 +134,7 @@ func dispatch(data []byte) {
 	switch message.Cmd {
 	case repo.CMD_PRIVATE:
 		// 发送消息给接受者
+		zap.S().Debugf("私聊消息 %+v", message)
 		go sendMsg(int64(message.ToId), data)
 	case repo.CMD_GROUP:
 		// 群聊, 查找群里面的所有用户发送数据
