@@ -26,6 +26,8 @@ func Router() *gin.Engine {
 	{
 		r.POST("user/login", service.Login)
 		r.POST("user/register", service.Register)
+		// chat
+		r.GET("/chat", service.Chat)
 	}
 
 	api := r.Group("/", middleware.Auth())
@@ -34,9 +36,6 @@ func Router() *gin.Engine {
 		api.GET("get/friend", service.GetFriend)
 		api.GET("get/friend/list", service.GetFriendList)
 		//api.DELETE("friend", service.DeleteFriend)
-
-		// chat
-		api.GET("/chat", service.Chat)
 	}
 	return r
 }

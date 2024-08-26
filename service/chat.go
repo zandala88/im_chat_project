@@ -25,9 +25,15 @@ type Node struct {
 }
 
 // 映射关系表
-var clientMap map[int64]*Node = make(map[int64]*Node)
+var clientMap = make(map[int64]*Node)
 
 func Chat(c *gin.Context) {
+	token := c.Query("token")
+	mc, err := util.VerifyJWT(token)
+	if err != nil {
+		zap.S().Errorf("ws链接解析token错误 err = %v", err)
+	}
+	c.Set("id", mc.Id)
 	userId := util.GetUid(c)
 	conn, err := (&websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {

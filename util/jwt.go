@@ -49,7 +49,7 @@ func VerifyJWT(tokenString string) (*MyClaims, error) {
 
 func GetUid(c *gin.Context) int64 {
 	value, exists := c.Get("id")
-	if exists {
+	if !exists {
 		zap.S().Info("ctx获取userId失败")
 	}
 	return value.(int64)
