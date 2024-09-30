@@ -28,8 +28,8 @@ Email:
   Key: HUPGSBWAWNLDJLAW
 
 ChannelType:
-  ChannelType: kafka
-  KafkaHosts: kafka:9092
+  ChannelType: gochannel
+  KafkaHosts: 47.113.118.26:9092
   KafkaTopic: go-chat-message
 
 StaticPath:

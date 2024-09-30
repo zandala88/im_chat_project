@@ -14,7 +14,7 @@ func InitProducer(topicInput, hosts string) {
 	config := sarama.NewConfig()
 	config.Producer.Compression = sarama.CompressionGZIP
 	client, err := sarama.NewClient(strings.Split(hosts, ","), config)
-	if nil != err {
+	if err != nil {
 		zap.S().Error("init kafka client error", zap.Any("init kafka client error", err.Error()))
 	}
 
