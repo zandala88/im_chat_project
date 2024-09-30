@@ -7,10 +7,12 @@ import (
 var Configs Config
 
 type Config struct {
-	MySQL MySQLConfig
-	Redis RedisConfig
-	Auth  AuthConfig
-	Email EmailConfig
+	MySQL       MySQLConfig
+	Redis       RedisConfig
+	Auth        AuthConfig
+	Email       EmailConfig
+	ChannelType ChannelTypeConfig
+	StaticPath  StaticPathConfig
 }
 
 type MySQLConfig struct {
@@ -45,6 +47,16 @@ type EmailConfig struct {
 	Service string
 	Addr    string
 	Key     string
+}
+
+type ChannelTypeConfig struct {
+	ChannelType string
+	KafkaHosts  string
+	KafkaTopic  string
+}
+
+type StaticPathConfig struct {
+	FilePath string
 }
 
 func init() {

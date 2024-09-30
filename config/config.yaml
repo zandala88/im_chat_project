@@ -26,3 +26,11 @@ Email:
   Service: smtp.163.com
   Addr: licehai5114141@163.com
   Key: HUPGSBWAWNLDJLAW
+
+ChannelType:
+  ChannelType: gochannel
+  KafkaHosts: kafka:9092
+  KafkaTopic: go-chat-message
+
+StaticPath:
+  FilePath: web/static/file/
