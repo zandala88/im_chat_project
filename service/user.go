@@ -21,7 +21,7 @@ func Register(c *gin.Context) {
 	}
 
 	// 查询手机号是否已存在
-	cnt, err := model.GetUserCountByPhone(nickname)
+	cnt, err := model.GetUserCountByPhone(phoneNumber)
 	if err != nil {
 		zap.S().Error("Register 系统错误", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -29,7 +29,7 @@ func Register(c *gin.Context) {
 	}
 	if cnt > 0 {
 		zap.S().Error("Register 账号已被注册")
-		util.FailRespWithCode(c, util.InternalServerError)
+		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
