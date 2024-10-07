@@ -1,40 +1,25 @@
 package main
 
 import (
-	"go.uber.org/zap"
 	"im/config"
-	_ "im/config"
-	"im/internal/kafka"
-	"im/internal/router"
-	server "im/internal/websocket"
-	"im/internal/websocket/constant"
 	_ "im/public"
-	"net/http"
-	"time"
+	"im/public/etcd"
+	"im/router"
+	"im/server/mq"
+	"im/service/rpc_server"
 )
 
 func main() {
-	if config.Configs.ChannelType.ChannelType == constant.KAFKA {
-		kafka.InitProducer(config.Configs.ChannelType.KafkaTopic, config.Configs.ChannelType.KafkaHosts)
-		kafka.InitConsumer(config.Configs.ChannelType.KafkaHosts)
-		go kafka.ConsumerMsg(server.ConsumerKafkaMsg)
-	}
+	mq.InitMessageMQ(config.Configs.RabbitMQ.URL)
+	// 初始化服务注册发现
+	go etcd.InitETCD()
 
-	zap.S().Info("start server", zap.String("start", "start web sever..."))
+	// 启动 http 服务
+	go router.HTTPRouter()
 
-	newRouter := router.NewRouter()
+	// 启动 rpc 服务
+	go rpc_server.InitRPCServer()
 
-	go server.MyServer.Start()
-
-	s := &http.Server{
-		Addr:           ":8888",
-		Handler:        newRouter,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-	err := s.ListenAndServe()
-	if nil != err {
-		zap.S().Error("server error", zap.Any("serverError", err))
-	}
+	// 启动 websocket 服务
+	router.WSRouter()
 }

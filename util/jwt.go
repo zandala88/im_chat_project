@@ -4,21 +4,18 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"im/config"
 	"time"
 )
 
 type MyClaims struct {
-	Id int64 `json:"id"`
+	UserId int64 `json:"user_id"`
 	jwt.StandardClaims
 }
 
 func GenerateJWT(Id int64) (string, error) {
-	// 创建一个我们自己的声明
-	//zap.S().Debugf("时间：%v", time.Now())
-	//zap.S().Debugf("有效期时长 %v", time.Duration(config.Configs.Auth.AccessExpire)*time.Second)
-	//zap.S().Debugf("token有效期到 %v", time.Now().Add(time.Duration(config.Configs.Auth.AccessExpire)))
 	c := MyClaims{
 		Id, // 自定义字段
 		jwt.StandardClaims{
@@ -48,9 +45,9 @@ func VerifyJWT(tokenString string) (*MyClaims, error) {
 }
 
 func GetUid(c *gin.Context) int64 {
-	value, exists := c.Get("id")
+	value, exists := c.Get("user_id")
 	if !exists {
 		zap.S().Info("ctx获取userId失败")
 	}
-	return value.(int64)
+	return cast.ToInt64(value)
 }

@@ -22,15 +22,23 @@ Redis:
   MinIdleConns: 10
   MaxRetries: 2
 
-Email:
-  Service: smtp.163.com
-  Addr: licehai5114141@163.com
-  Key: HUPGSBWAWNLDJLAW
+App:
+  Salt: "zandalaGoIm"
+  IP: 47.113.118.26
+  HTTPServerPort: "9090"
+  WebsocketPort: "9091"
+  RPCPort: "9092"
+  WorkerPoolSize: 10
+  MaxWorkerTask: 1024
+  HeartbeatTimeout: 600
+  HeartbeatInterval: 60
 
-ChannelType:
-  ChannelType: gochannel
-  KafkaHosts: 47.113.118.26:9092
-  KafkaTopic: go-chat-message
+ETCD:
+  Endpoints:
+    - "47.113.118.26:2379"
+  Timeout: 5
+  ServerList: "/wsServers/"
 
-StaticPath:
-  FilePath: web/static/file/
+
+RabbitMQ:
+  URL: "amqp://guest:guest@47.113.118.26:5672/"

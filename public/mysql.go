@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var Db *gorm.DB
+var DB *gorm.DB
 
 func init() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
@@ -31,5 +31,5 @@ func init() {
 		panic(err)
 	}
 
-	Db = db
+	DB = db
 }

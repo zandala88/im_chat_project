@@ -24,28 +24,22 @@ func FailRespWithCode(c *gin.Context, code int) {
 	})
 }
 
+func GetErrorMessage(code int) string {
+	return errMsg[code]
+}
+
 var errMsg = map[int]string{
-	NoToken:             "没有token,请重新登录",
-	TokenError:          "token错误",
+	Ok: "Success",
+
+	InternalServerError: "服务器内部错误",
 	InvalidToken:        "无效的Token",
-	ShouldBindJSONError: "参数绑定错误",
-	CURDSelectError:     "查询失败",
-	CURDInsertError:     "插入失败",
-	CURDUpdateError:     "更新失败",
-	CURDDeleteError:     "删除失败",
-	SendEmailIn3Min:     "3分钟内只能发送一次邮件",
-	SendEmailError:      "发送邮件失败",
+	ShouldBindJSONError: "参数错误",
 }
 
 const (
-	NoToken             = 2003
-	TokenError          = 2004
-	InvalidToken        = 2005
-	ShouldBindJSONError = 2006
-	CURDSelectError     = 2007
-	CURDInsertError     = 2008
-	CURDUpdateError     = 2009
-	CURDDeleteError     = 2010
-	SendEmailIn3Min     = 2011
-	SendEmailError      = 2012
+	Ok = 200
+
+	InternalServerError = iota + 2001
+	InvalidToken
+	ShouldBindJSONError
 )
