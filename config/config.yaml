@@ -24,7 +24,7 @@ Redis:
 
 App:
   Salt: "zandalaGoIm"
-  IP: 47.113.118.26
+  IP: localhost
   HTTPServerPort: "9090"
   WebsocketPort: "9091"
   RPCPort: "9092"
