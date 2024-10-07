@@ -83,3 +83,24 @@ func GetUserIdByIds(ids []int64) ([]int64, error) {
 	}
 	return newIds, nil
 }
+
+func GetFriends(userId int64) ([]*User, error) {
+	var users []*User
+	err := public.DB.Raw("select * from user where id in (select friend_id from friend where user_id = ?)", userId).Scan(&users).Error
+	if err != nil {
+		zap.S().Errorf("GetFriends failed, err:%v", err)
+		return nil, err
+	}
+	return users, nil
+}
+
+func DeleteFriend(userId, friendId int64) error {
+	err := public.DB.Where("user_id = ? and friend_id = ?", userId, friendId).
+		Or("user_id = ? and friend_id = ?", friendId, userId).
+		Delete(&Friend{}).Error
+	if err != nil {
+		zap.S().Errorf("DeleteFriend failed, err:%v", err)
+		return err
+	}
+	return nil
+}

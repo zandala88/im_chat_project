@@ -33,6 +33,6 @@ func MessageCreateHandler(d rabbitmq.Delivery) rabbitmq.Action {
 		return rabbitmq.NackDiscard
 	}
 
-	//fmt.Println("处理完消息：", string(d.Body))
+	zap.S().Debug("处理完消息：", string(d.Body))
 	return rabbitmq.Ack
 }

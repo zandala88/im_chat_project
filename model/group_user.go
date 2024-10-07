@@ -41,3 +41,24 @@ func GetGroupUserIdsByGroupId(groupId int64) ([]int64, error) {
 	}
 	return ids, nil
 }
+
+func JoinGroup(groupId, userId int64) error {
+	err := public.DB.Create(&GroupUser{
+		GroupID: groupId,
+		UserID:  userId,
+	}).Error
+	if err != nil {
+		zap.S().Errorf("JoinGroup failed, err:%v", err)
+		return err
+	}
+	return nil
+}
+
+func ExitGroup(groupId, userId int64) error {
+	err := public.DB.Where("group_id = ? and user_id = ?", groupId, userId).Delete(&GroupUser{}).Error
+	if err != nil {
+		zap.S().Errorf("ExitGroup failed, err:%v", err)
+		return err
+	}
+	return nil
+}

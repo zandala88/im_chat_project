@@ -2,8 +2,8 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	clientV3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/zap"
 	"im/config"
 	"time"
 )
@@ -24,7 +24,7 @@ func RegisterServer(key string, value string, lease int64) error {
 		DialTimeout: time.Duration(config.Configs.ETCD.Timeout) * time.Second,
 	})
 	if err != nil {
-		fmt.Println("etcd err:", err)
+		zap.S().Error("etcd err:", err)
 		return err
 	}
 
@@ -73,12 +73,9 @@ func (r *Register) putKeyWithLease(timeNum int64) error {
 func (r *Register) ListenLeaseRespChan() {
 	defer r.close()
 
-	//for leaseKeepResp := range r.keepAliveChan {
-	//	fmt.Printf("续租成功，leaseID:%d, Put key:%s,val:%s reps:+%v\n", r.leaseID, r.key, r.val, leaseKeepResp)
-	//}
 	for range r.keepAliveChan {
 	}
-	fmt.Printf("续约失败，leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
+	zap.S().Errorf("续约失败，leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
 }
 
 // Close 撤销租约
@@ -87,6 +84,6 @@ func (r *Register) close() error {
 	if _, err := r.client.Revoke(context.Background(), r.leaseID); err != nil {
 		return err
 	}
-	fmt.Printf("撤销租约成功, leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
+	zap.S().Debug("撤销租约成功, leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
 	return r.client.Close()
 }

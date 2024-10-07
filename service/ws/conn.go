@@ -1,8 +1,8 @@
 package ws
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"im/config"
 	"im/public/protocol"
@@ -55,15 +55,15 @@ func (c *Conn) Start() {
 
 // StartReader 用于从客户端中读取数据
 func (c *Conn) StartReader() {
-	fmt.Println("[Reader Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr(), "[conn Reader exit!]")
+	zap.S().Debug("[Reader Goroutine is running]")
+	defer zap.S().Debug(c.RemoteAddr(), "[conn Reader exit!]")
 	defer c.Stop()
 
 	for {
 		// 阻塞读
 		_, data, err := c.Socket.ReadMessage()
 		if err != nil {
-			fmt.Println("read msg data error ", err)
+			zap.S().Error("read msg data error ", err)
 			return
 		}
 
@@ -79,10 +79,10 @@ func (c *Conn) HandlerMessage(bytes []byte) {
 	input := new(protocol.Input)
 	err := proto.Unmarshal(bytes, input)
 	if err != nil {
-		fmt.Println("unmarshal error", err)
+		zap.S().Error("unmarshal error： ", err)
 		return
 	}
-	//fmt.Println("收到消息：", input)
+	zap.S().Debug("收到消息：", input)
 
 	// 对未登录用户进行拦截
 	if input.Type != protocol.CmdType_CT_Login && c.GetUserId() == 0 {
@@ -107,7 +107,7 @@ func (c *Conn) HandlerMessage(bytes []byte) {
 	case protocol.CmdType_CT_Sync: // 离线消息同步
 		req.f = req.Sync
 	default:
-		fmt.Println("未知消息类型")
+		zap.S().Debug("未知消息类型")
 	}
 
 	if req.f == nil {
@@ -128,7 +128,7 @@ func (c *Conn) SendMsg(userId int64, bytes []byte) {
 
 	// 已关闭
 	if c.isClose {
-		fmt.Println("connection closed when send msg")
+		zap.S().Debug("connection closed when send msg")
 		return
 	}
 
@@ -146,15 +146,15 @@ func (c *Conn) SendMsg(userId int64, bytes []byte) {
 
 // StartWriter 向客户端写数据
 func (c *Conn) StartWriter() {
-	fmt.Println("[Writer Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr(), "[conn Writer exit!]")
+	zap.S().Debug("[Writer Goroutine is running]")
+	defer zap.S().Debug(c.RemoteAddr(), "[conn Writer exit!]")
 
 	var err error
 	for {
 		select {
 		case data := <-c.sendCh:
 			if err = c.Socket.WriteMessage(websocket.BinaryMessage, data); err != nil {
-				fmt.Println("Send Data error:, ", err, " Conn Writer exit")
+				zap.S().Error("Send Data error:, ", err, " Conn Writer exit")
 				return
 			}
 			// 更新心跳时间
@@ -168,8 +168,8 @@ func (c *Conn) StartWriter() {
 // StartWriterWithBuffer 向客户端写数据
 // 由延迟优先调整为吞吐优先，使得消息的整体吞吐提升，但是单条消息的延迟会有所上升
 func (c *Conn) StartWriterWithBuffer() {
-	fmt.Println("[Writer Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr(), "[conn Writer exit!]")
+	zap.S().Debug("[Writer Goroutine is running]")
+	defer zap.S().Debug(c.RemoteAddr(), "[conn Writer exit!]")
 
 	// 每 100ms 或者当 buffer 中存够 50 条数据时，进行发送
 	tickerInterval := 100
@@ -181,14 +181,14 @@ func (c *Conn) StartWriterWithBuffer() {
 		if len(buffer.Outputs) == 0 {
 			return
 		}
-		//fmt.Println("buffer 长度：", len(buffer.Outputs))
+
 		sendData, err := proto.Marshal(buffer)
 		if err != nil {
-			fmt.Println("send data proto.Marshal err:", err)
+			zap.S().Error("send data proto.Marshal err:", err)
 			return
 		}
 		if err = c.Socket.WriteMessage(websocket.BinaryMessage, sendData); err != nil {
-			fmt.Println("Send Data error:, ", err, " Conn Writer exit")
+			zap.S().Error("Send Data error:, ", err, " Conn Writer exit")
 			return
 		}
 		buffer.Outputs = make([][]byte, 0, bufferLimit)
@@ -237,7 +237,7 @@ func (c *Conn) Stop() {
 	close(c.exitCh)
 	close(c.sendCh)
 
-	fmt.Println("Conn Stop() ... UserId = ", c.GetUserId())
+	zap.S().Debug("Conn Stop() ... UserId = ", c.GetUserId())
 }
 
 // KeepLive 更新心跳
@@ -284,7 +284,7 @@ func (c *Conn) CompareAndIncrClientID(newMaxClientId int64) bool {
 	c.maxClientIdMutex.Lock()
 	defer c.maxClientIdMutex.Unlock()
 
-	//fmt.Println("收到的 newMaxClientId 是：", newMaxClientId, "此时 c.maxClientId 是：", c.maxClientId)
+	zap.S().Debug("收到的 newMaxClientId 是：", newMaxClientId, "此时 c.maxClientId 是：", c.maxClientId)
 	if c.maxClientId+1 == newMaxClientId {
 		c.maxClientId++
 		return true

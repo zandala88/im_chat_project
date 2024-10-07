@@ -217,10 +217,10 @@ func SendToGroup(msg *protocol.Message) error {
 	for _, addr := range services {
 		// 如果是本机，进行本地推送
 		if local == addr {
-			//fmt.Println("进行本地推送")
+			zap.S().Debug("进行本地推送")
 			GetServer().SendMessageAll(userId2Msg)
 		} else {
-			// fmt.Println("远端推送：", addr)
+			zap.S().Debug("远端推送：", addr)
 			// 如果不是本机，进行远程 RPC 调用
 			_, err = rpc.GetServerClient(addr).DeliverMessageAll(context.Background(), &protocol.DeliverMessageAllReq{
 				ReceiverId_2Data: userId2Msg,

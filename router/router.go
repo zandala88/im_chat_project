@@ -26,13 +26,31 @@ func HTTPRouter() {
 	auth := r.Group("", middlewares.AuthCheck())
 	{
 		// 添加好友
-		auth.POST("/friend/add", service.AddFriend)
+		auth.POST("/friend", service.AddFriend)
+
+		// 好友列表
+		auth.GET("/friend/list", service.FriendList)
+
+		// 删除好友
+		auth.DELETE("/friend", service.DeleteFriend)
+
+		// 群聊列表
+		auth.GET("/group/list", service.GroupList)
+
+		// 加入群聊
+		auth.POST("/group/join", service.JoinGroup)
+
+		// 退出群聊
+		auth.POST("/group/exit", service.ExitGroup)
+
+		// 解散群聊
+		auth.DELETE("/group", service.DeleteGroup)
 
 		// 创建群聊
-		auth.POST("/group/create", service.CreateGroup)
+		auth.POST("/group", service.CreateGroup)
 
 		// 获取群成员列表
-		auth.GET("/group_user/list", service.GroupUserList)
+		auth.GET("/group/user/list", service.GroupUserList)
 	}
 
 	httpAddr := fmt.Sprintf("%s:%s", config.Configs.App.IP, config.Configs.App.HTTPServerPort)

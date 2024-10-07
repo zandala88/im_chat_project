@@ -52,3 +52,25 @@ func GetGroupUser(groupId int64) ([]int64, error) {
 	}
 	return userIds, nil
 }
+
+// DeleteGroupUser 删除某个成员
+func DeleteGroupUser(groupId, userId int64) error {
+	key := getGroupUserKey(groupId)
+	_, err := public.Redis.SRem(context.Background(), key, userId).Result()
+	if err != nil {
+		zap.S().Error("[删除群成员信息] 错误,err:", err)
+		return err
+	}
+	return nil
+}
+
+// DeleteGroupUserAll 删除所有成员
+func DeleteGroupUserAll(groupId int64) error {
+	key := getGroupUserKey(groupId)
+	_, err := public.Redis.Del(context.Background(), key).Result()
+	if err != nil {
+		zap.S().Error("[删除群成员信息] 错误,err:", err)
+		return err
+	}
+	return nil
+}

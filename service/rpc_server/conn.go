@@ -3,6 +3,7 @@ package rpc_server
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"im/config"
@@ -22,7 +23,7 @@ func (*ConnectServer) DeliverMessage(ctx context.Context, req *protocol.DeliverM
 	// 获取本地连接
 	conn := ws.GetServer().GetConn(req.ReceiverId)
 	if conn == nil || conn.GetUserId() != req.ReceiverId {
-		fmt.Println("[DeliverMessage] 连接不存在 user_id:", req.ReceiverId)
+		zap.S().Debug("[DeliverMessage] 连接不存在 user_id:", req.ReceiverId)
 		return resp, nil
 	}
 
@@ -51,7 +52,7 @@ func InitRPCServer() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	fmt.Println("rpc server 启动 ", rpcPort)
+	zap.S().Debug("rpc server 启动 ", rpcPort)
 
 	if err := server.Serve(listen); err != nil {
 		log.Fatalf("failed to rpc serve: %v", err)

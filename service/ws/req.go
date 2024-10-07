@@ -32,7 +32,7 @@ func (r *Req) Login() {
 	loginMsg := new(protocol.LoginMsg)
 	err := proto.Unmarshal(r.data, loginMsg)
 	if err != nil {
-		zap.S().Error("[用户登录] unmarshal error,err:", err)
+		zap.S().Error("[用户登录] unmarshal error,err: ", err)
 		return
 	}
 	// 登录校验

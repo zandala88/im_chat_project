@@ -1,7 +1,7 @@
 package ws
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"im/config"
 	"sync"
 )
@@ -30,7 +30,7 @@ func GetServer() *Server {
 
 // Stop 关闭服务
 func (cm *Server) Stop() {
-	fmt.Println("server stop ...")
+	zap.S().Debug("server stop ...")
 	ch := make(chan struct{}, 1000) // 控制并发数
 	var wg sync.WaitGroup
 	connAll := cm.GetConnAll()
@@ -53,13 +53,13 @@ func (cm *Server) Stop() {
 // AddConn 添加连接
 func (cm *Server) AddConn(userId int64, conn *Conn) {
 	cm.connMap.Store(userId, conn)
-	fmt.Printf("connection UserId=%d add to Server\n", userId)
+	zap.S().Debugf("connection UserId=%d add to Server\n", userId)
 }
 
 // RemoveConn 删除连接
 func (cm *Server) RemoveConn(userId int64) {
 	cm.connMap.Delete(userId)
-	fmt.Printf("connection UserId=%d remove from Server\n", userId)
+	zap.S().Debugf("connection UserId=%d remove from Server\n", userId)
 }
 
 // GetConn 根据userid获取相应的连接
@@ -117,7 +117,7 @@ func (cm *Server) StartWorkerPool() {
 
 // StartOneWorker 启动 worker 的工作流程
 func (cm *Server) StartOneWorker(workerID int, taskQueue chan *Req) {
-	fmt.Println("Worker ID = ", workerID, " is started.")
+	zap.S().Debug("Worker ID = ", workerID, " is started.")
 	for {
 		select {
 		case req := <-taskQueue:

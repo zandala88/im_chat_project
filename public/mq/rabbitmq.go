@@ -1,8 +1,8 @@
 package mq
 
 import (
-	"fmt"
 	"github.com/wagslane/go-rabbitmq"
+	"go.uber.org/zap"
 )
 
 type Conn struct {
@@ -68,7 +68,7 @@ func InitRabbitMQ(url string, f rabbitmq.Handler, queue, routingKey, exchangeNam
 // Publish 发送消息，该消息实际由执行 InitRabbitMQ 注册时传入的 f 消费
 func (c *Conn) Publish(data []byte) error {
 	if data == nil || len(data) == 0 {
-		fmt.Println("data 为空，publish 不发送")
+		zap.S().Debug("data 为空，publish 不发送")
 		return nil
 	}
 	return c.publisher.Publish(

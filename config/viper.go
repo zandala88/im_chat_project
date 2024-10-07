@@ -13,6 +13,7 @@ type Config struct {
 	App      AppConfig
 	ETCD     ETCDConfig
 	RabbitMQ RabbitMQConfig
+	Logger   LoggerConfig
 }
 
 type MySQLConfig struct {
@@ -63,6 +64,10 @@ type ETCDConfig struct {
 
 type RabbitMQConfig struct {
 	URL string // rabbitmq url
+}
+
+type LoggerConfig struct {
+	Type string
 }
 
 func init() {

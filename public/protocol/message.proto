@@ -51,7 +51,7 @@ message Input {
 message Output {
   CmdType type = 1;  // 消息类型，根据不同的消息类型，可以将 data 解析成下面其他类型
   int32 code = 2;  // 错误码
-  string CodeMsg = 3;  // 错误码信息
+  string codeMsg = 3;  // 错误码信息
   bytes data = 4;  // 数据
 }
 

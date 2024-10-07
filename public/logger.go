@@ -8,6 +8,8 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"im/config"
+	"os"
 	"time"
 )
 
@@ -21,13 +23,21 @@ func init() {
 	}
 	defer lumberjacklogger.Close()
 
-	config := zap.NewProductionEncoderConfig()
-	config.EncodeTime = zapcore.ISO8601TimeEncoder // 设置时间格式
-	fileEncoder := zapcore.NewConsoleEncoder(config)
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder // 设置时间格式
+	fileEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+
+	var logOutput zapcore.WriteSyncer
+	if config.Configs.Logger.Type == "file" {
+		logOutput = zapcore.AddSync(lumberjacklogger)
+	} else {
+		logOutput = zapcore.AddSync(os.Stdout)
+	}
+
 	core := zapcore.NewCore(
-		fileEncoder,                       //编码设置
-		zapcore.AddSync(lumberjacklogger), //输出到文件
-		zap.DebugLevel,                    //日志等级
+		fileEncoder,    //编码设置
+		logOutput,      //输出到文件
+		zap.DebugLevel, //日志等级
 	)
 
 	log := zap.New(core, zap.AddCaller())
