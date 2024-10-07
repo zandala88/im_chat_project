@@ -18,3 +18,5 @@
 .idea
 
 runlog/
+
+config/config.yaml
