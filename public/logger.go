@@ -24,7 +24,9 @@ func init() {
 	defer lumberjacklogger.Close()
 
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder // 设置时间格式
+	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02 15:04:05"))
+	} // 设置时间格式
 	fileEncoder := zapcore.NewConsoleEncoder(encoderConfig)
 
 	var logOutput zapcore.WriteSyncer
