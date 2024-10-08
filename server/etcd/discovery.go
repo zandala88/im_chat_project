@@ -52,10 +52,10 @@ func (d *Discovery) watcher(prefix string) {
 		for _, ev := range wresp.Events {
 			switch ev.Type {
 			case mvccpb.PUT: //修改或者新增
-				zap.S().Info("修改或新增, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
+				zap.S().Infof("修改或新增, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
 				d.serverMap.Store(string(ev.Kv.Key), string(ev.Kv.Value))
 			case mvccpb.DELETE: //删除
-				zap.S().Info("删除, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
+				zap.S().Infof("删除, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
 				d.serverMap.Delete(string(ev.Kv.Key))
 			}
 		}

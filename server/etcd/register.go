@@ -84,6 +84,6 @@ func (r *Register) close() error {
 	if _, err := r.client.Revoke(context.Background(), r.leaseID); err != nil {
 		return err
 	}
-	zap.S().Debug("撤销租约成功, leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
+	zap.S().Debugf("撤销租约成功, leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
 	return r.client.Close()
 }

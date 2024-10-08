@@ -27,12 +27,12 @@ func SetGroupUser(groupId int64, userIds []int64) error {
 	}
 	_, err := public.Redis.SAdd(context.Background(), key, values).Result()
 	if err != nil {
-		zap.S().Error("[设置群成员信息] 错误,err:", err)
+		zap.S().Error("[设置群成员信息] 错误,err: ", err)
 		return err
 	}
 	_, err = public.Redis.Expire(context.Background(), key, ttl2H*time.Second).Result()
 	if err != nil {
-		zap.S().Error("[设置群成员信息] 过期时间设置错误,err:", err)
+		zap.S().Error("[设置群成员信息] 过期时间设置错误,err: ", err)
 		return err
 	}
 	return nil
@@ -43,7 +43,7 @@ func GetGroupUser(groupId int64) ([]int64, error) {
 	key := getGroupUserKey(groupId)
 	result, err := public.Redis.SMembers(context.Background(), key).Result()
 	if err != nil {
-		zap.S().Error("[获取群成员信息] 错误，err:", err)
+		zap.S().Error("[获取群成员信息] 错误，err: ", err)
 		return nil, err
 	}
 	userIds := make([]int64, 0, len(result))
@@ -58,7 +58,7 @@ func DeleteGroupUser(groupId, userId int64) error {
 	key := getGroupUserKey(groupId)
 	_, err := public.Redis.SRem(context.Background(), key, userId).Result()
 	if err != nil {
-		zap.S().Error("[删除群成员信息] 错误,err:", err)
+		zap.S().Error("[删除群成员信息] 错误,err: ", err)
 		return err
 	}
 	return nil
@@ -69,7 +69,7 @@ func DeleteGroupUserAll(groupId int64) error {
 	key := getGroupUserKey(groupId)
 	_, err := public.Redis.Del(context.Background(), key).Result()
 	if err != nil {
-		zap.S().Error("[删除群成员信息] 错误,err:", err)
+		zap.S().Error("[删除群成员信息] 错误,err: ", err)
 		return err
 	}
 	return nil
