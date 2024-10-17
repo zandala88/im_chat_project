@@ -25,7 +25,7 @@ func IsBelongToGroup(userId, groupId int64) (bool, error) {
 		Where("user_id = ? and group_id = ?", userId, groupId).
 		Count(&cnt).Error
 	if err != nil {
-		zap.S().Errorf("IsBelongToGroup failed, err:%v", err)
+		zap.S().Error("[GroupUser] [IsBelongToGroup] [err] = ", err)
 		return false, err
 	}
 	return cnt > 0, nil
@@ -36,7 +36,7 @@ func GetGroupUserIdsByGroupId(groupId int64) ([]int64, error) {
 	err := public.DB.Model(&GroupUser{}).
 		Where("group_id = ?", groupId).Pluck("user_id", &ids).Error
 	if err != nil {
-		zap.S().Errorf("GetGroupUserIdsByGroupId failed, err:%v", err)
+		zap.S().Error("[GroupUser] [GetGroupUserIdsByGroupId] [err] = ", err)
 		return nil, err
 	}
 	return ids, nil
@@ -48,7 +48,7 @@ func JoinGroup(groupId, userId int64) error {
 		UserID:  userId,
 	}).Error
 	if err != nil {
-		zap.S().Errorf("JoinGroup failed, err:%v", err)
+		zap.S().Error("[GroupUser] [JoinGroup] [err] = ", err)
 		return err
 	}
 	return nil
@@ -57,7 +57,7 @@ func JoinGroup(groupId, userId int64) error {
 func ExitGroup(groupId, userId int64) error {
 	err := public.DB.Where("group_id = ? and user_id = ?", groupId, userId).Delete(&GroupUser{}).Error
 	if err != nil {
-		zap.S().Errorf("ExitGroup failed, err:%v", err)
+		zap.S().Error("[GroupUser] [ExitGroup] [err] = ", err)
 		return err
 	}
 	return nil

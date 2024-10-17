@@ -18,7 +18,7 @@ func init() {
 		config.Configs.MySQL.Port, config.Configs.MySQL.Database, config.Configs.MySQL.Charset,
 		config.Configs.MySQL.ParseTime, config.Configs.MySQL.Loc)
 
-	zap.S().Debug("init mysql dsn = ", dsn)
+	zap.S().Debug("[init] [mysql] [dsn] = ", dsn)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		PrepareStmt:            true,
@@ -31,7 +31,7 @@ func init() {
 		},
 	})
 	if err != nil {
-		zap.S().Error("init mysql err = ", err)
+		zap.S().Error("[init] [gorm.Open] [err] = ", err.Error())
 		panic(err)
 	}
 

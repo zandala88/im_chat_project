@@ -22,7 +22,7 @@ func NewDiscovery() (*Discovery, error) {
 		DialTimeout: time.Duration(config.Configs.ETCD.Timeout) * time.Second,
 	})
 	if err != nil {
-		zap.S().Error("etcd err:", err)
+		zap.S().Error("[NewDiscovery] [etcd] [err] = ", err)
 		return nil, err
 	}
 	return &Discovery{client: client}, nil
@@ -33,6 +33,7 @@ func (d *Discovery) WatchService(prefix string) error {
 	//根据前缀获取现有的key
 	resp, err := d.client.Get(context.TODO(), prefix, clientV3.WithPrefix())
 	if err != nil {
+		zap.S().Error("[WatchService] [client.Get] [err] = ", err)
 		return err
 	}
 	for i := range resp.Kvs {
@@ -47,15 +48,15 @@ func (d *Discovery) WatchService(prefix string) error {
 
 func (d *Discovery) watcher(prefix string) {
 	rch := d.client.Watch(context.TODO(), prefix, clientV3.WithPrefix())
-	zap.S().Debugf("监听前缀: %s ..\n", prefix)
+	zap.S().Info("[watcher] [prefix] = ", prefix)
 	for wresp := range rch {
 		for _, ev := range wresp.Events {
 			switch ev.Type {
 			case mvccpb.PUT: //修改或者新增
-				zap.S().Infof("修改或新增, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
+				zap.S().Infof("[watcher] 修改或新增, [key] = %s, [value] = %s", string(ev.Kv.Key), string(ev.Kv.Value))
 				d.serverMap.Store(string(ev.Kv.Key), string(ev.Kv.Value))
 			case mvccpb.DELETE: //删除
-				zap.S().Infof("删除, key:%s, value:%s\n", string(ev.Kv.Key), string(ev.Kv.Value))
+				zap.S().Infof("[watcher] 删除, [key] = %s, [value] = %s", string(ev.Kv.Key), string(ev.Kv.Value))
 				d.serverMap.Delete(string(ev.Kv.Key))
 			}
 		}

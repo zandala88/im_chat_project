@@ -15,7 +15,7 @@ func CreateGroup(c *gin.Context) {
 	name := c.PostForm("name")
 	idsStr := c.PostFormArray("ids") // 群成员 id，不包括群创建者
 	if name == "" || len(idsStr) == 0 {
-		zap.S().Error("CreateGroup 参数不正确")
+		zap.S().Error("[CreateGroup] 参数不正确")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -31,7 +31,7 @@ func CreateGroup(c *gin.Context) {
 	// 获取 ids 用户信息
 	ids, err := model.GetUserIdByIds(ids)
 	if err != nil {
-		zap.S().Error("CreateGroup 获取用户信息失败", err.Error())
+		zap.S().Error("[CreateGroup] [model.GetUserIdByIds] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -43,7 +43,7 @@ func CreateGroup(c *gin.Context) {
 	}
 	err = model.CreateGroup(group, ids)
 	if err != nil {
-		zap.S().Error("CreateGroup 创建群组失败", err.Error())
+		zap.S().Error("[CreateGroup] [model.CreateGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -51,7 +51,7 @@ func CreateGroup(c *gin.Context) {
 	// 将群成员信息更新到 Redis
 	err = cache.SetGroupUser(group.ID, ids)
 	if err != nil {
-		zap.S().Error("CreateGroup 缓存群成员失败", err.Error())
+		zap.S().Error("[CreateGroup] [model.SetGroupUser] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -65,7 +65,7 @@ func GroupList(c *gin.Context) {
 	userId := util.GetUid(c)
 	groups, err := model.GetGroups(userId)
 	if err != nil {
-		zap.S().Error("GroupList 获取群组列表失败", err.Error())
+		zap.S().Error("[GroupList] [model.GetGroups] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -77,7 +77,7 @@ func JoinGroup(c *gin.Context) {
 	groupIdStr := c.PostForm("group_id")
 	groupId := cast.ToInt64(groupIdStr)
 	if groupId == 0 {
-		zap.S().Error("JoinGroup 参数不正确")
+		zap.S().Error("[JoinGroup] groupId == 0")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -85,7 +85,7 @@ func JoinGroup(c *gin.Context) {
 	// 查看群是否存在
 	_, err := model.GetGroupById(groupId)
 	if err != nil {
-		zap.S().Error("JoinGroup 获取群组失败", err.Error())
+		zap.S().Error("[JoinGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -94,12 +94,12 @@ func JoinGroup(c *gin.Context) {
 	userId := util.GetUid(c)
 	isBelong, err := model.IsBelongToGroup(userId, groupId)
 	if err != nil {
-		zap.S().Error("JoinGroup 获取群组失败", err.Error())
+		zap.S().Error("[JoinGroup] [model.IsBelongToGroup] 获取群组失败 [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if isBelong {
-		zap.S().Error("JoinGroup 用户已在群组中")
+		zap.S().Error("[JoinGroup] isBelong == true")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -107,7 +107,7 @@ func JoinGroup(c *gin.Context) {
 	// 加入群组
 	err = model.JoinGroup(groupId, userId)
 	if err != nil {
-		zap.S().Error("JoinGroup 加入群组失败", err.Error())
+		zap.S().Error("[JoinGroup] [model.JoinGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -115,7 +115,7 @@ func JoinGroup(c *gin.Context) {
 	// 将群成员信息更新到 Redis
 	err = cache.SetGroupUser(groupId, []int64{userId})
 	if err != nil {
-		zap.S().Error("JoinGroup 缓存群成员失败", err.Error())
+		zap.S().Error("[JoinGroup] [cache.SetGroupUser] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -127,7 +127,7 @@ func ExitGroup(c *gin.Context) {
 	groupIdStr := c.PostForm("group_id")
 	groupId := cast.ToInt64(groupIdStr)
 	if groupId == 0 {
-		zap.S().Error("ExitGroup 参数不正确")
+		zap.S().Error("[ExitGroup] groupId == 0")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -135,7 +135,7 @@ func ExitGroup(c *gin.Context) {
 	// 查看群是否存在
 	_, err := model.GetGroupById(groupId)
 	if err != nil {
-		zap.S().Error("ExitGroup 获取群组失败", err.Error())
+		zap.S().Error("[ExitGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -144,12 +144,12 @@ func ExitGroup(c *gin.Context) {
 	userId := util.GetUid(c)
 	isBelong, err := model.IsBelongToGroup(userId, groupId)
 	if err != nil {
-		zap.S().Error("ExitGroup 获取群组失败", err.Error())
+		zap.S().Error("[ExitGroup] [model.IsBelongToGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if !isBelong {
-		zap.S().Error("ExitGroup 用户不在群组中")
+		zap.S().Error("[ExitGroup] isBelong == false")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -157,7 +157,7 @@ func ExitGroup(c *gin.Context) {
 	// 退出群组
 	err = model.ExitGroup(groupId, userId)
 	if err != nil {
-		zap.S().Error("ExitGroup 退出群组失败", err.Error())
+		zap.S().Error("[ExitGroup] [model.ExitGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -165,7 +165,7 @@ func ExitGroup(c *gin.Context) {
 	// 从 Redis 中删除群成员信息
 	err = cache.DeleteGroupUser(groupId, userId)
 	if err != nil {
-		zap.S().Error("ExitGroup 删除群成员失败", err.Error())
+		zap.S().Error("[ExitGroup] [cache.DeleteGroupUser] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -177,7 +177,7 @@ func DeleteGroup(c *gin.Context) {
 	groupIdStr := c.PostForm("group_id")
 	groupId := cast.ToInt64(groupIdStr)
 	if groupId == 0 {
-		zap.S().Error("DeleteGroup 参数不正确")
+		zap.S().Error("[DeleteGroup] groupId == 0")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -185,7 +185,7 @@ func DeleteGroup(c *gin.Context) {
 	// 查看群是否存在
 	_, err := model.GetGroupById(groupId)
 	if err != nil {
-		zap.S().Error("DeleteGroup 获取群组失败", err.Error())
+		zap.S().Error("[DeleteGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -194,12 +194,12 @@ func DeleteGroup(c *gin.Context) {
 	userId := util.GetUid(c)
 	isOwner, err := model.IsGroupOwner(userId, groupId)
 	if err != nil {
-		zap.S().Error("DeleteGroup 获取群主失败", err.Error())
+		zap.S().Error("[DeleteGroup] [model.IsGroupOwner] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if !isOwner {
-		zap.S().Error("DeleteGroup 用户不是群主")
+		zap.S().Error("[DeleteGroup] isOwner == false")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -207,7 +207,7 @@ func DeleteGroup(c *gin.Context) {
 	// 删除群组
 	err = model.DeleteGroup(groupId)
 	if err != nil {
-		zap.S().Error("DeleteGroup 删除群组失败", err.Error())
+		zap.S().Error("[DeleteGroup] [model.DeleteGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -215,7 +215,7 @@ func DeleteGroup(c *gin.Context) {
 	// 从 Redis 中删除群成员信息
 	err = cache.DeleteGroupUserAll(groupId)
 	if err != nil {
-		zap.S().Error("DeleteGroup 删除群成员失败", err.Error())
+		zap.S().Error("[DeleteGroup] [cache.DeleteGroupUserAll] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}

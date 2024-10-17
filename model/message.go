@@ -35,7 +35,7 @@ func ProtoMarshalToMessage(data []byte) []*Message {
 	mqMessages := &protocol.MQMessages{}
 	err := proto.Unmarshal(data, mqMessages)
 	if err != nil {
-		zap.S().Error("json.Unmarshal(mqMessages) 失败,err:", err)
+		zap.S().Error("[Message] [ProtoMarshalToMessage] json.Unmarshal [err] = ", err)
 		return nil
 	}
 	for _, mqMessage := range mqMessages.Messages {
@@ -73,7 +73,7 @@ func MessageToProtoMarshal(messages ...*Message) []byte {
 	}
 	bytes, err := proto.Marshal(&protocol.MQMessages{Messages: mqMessage})
 	if err != nil {
-		zap.S().Error("json.Marshal(messages) 失败,err:", err)
+		zap.S().Error("[Message] [MessageToProtoMarshal] json.Marshal [err] = ", err)
 		return nil
 	}
 	return bytes
@@ -103,11 +103,11 @@ func ListByUserIdAndSeq(userId, seq int64, limit int) ([]Message, bool, error) {
 	err := public.DB.Model(&Message{}).Where("user_id = ? and seq > ?", userId, seq).
 		Count(&cnt).Error
 	if err != nil {
-		zap.S().Error("ListByUserIdAndSeq Count err:", err)
+		zap.S().Error("[Message] [ListByUserIdAndSeq] Count [err] = ", err)
 		return nil, false, err
 	}
 	if cnt == 0 {
-		zap.S().Error("ListByUserIdAndSeq Count is 0")
+		zap.S().Debug("[Message] [ListByUserIdAndSeq] Count is 0 | userId = ", userId)
 		return nil, false, nil
 	}
 
@@ -115,7 +115,7 @@ func ListByUserIdAndSeq(userId, seq int64, limit int) ([]Message, bool, error) {
 	err = public.DB.Model(&Message{}).Where("user_id = ? and seq > ?", userId, seq).
 		Limit(limit).Order("seq ASC").Find(&messages).Error
 	if err != nil {
-		zap.S().Error("ListByUserIdAndSeq Find err:", err)
+		zap.S().Error("[Message] [ListByUserIdAndSeq] Find [err] = ", err)
 		return nil, false, err
 	}
 	return messages, cnt > int64(limit), nil

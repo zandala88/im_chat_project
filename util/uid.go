@@ -102,14 +102,14 @@ func (u *uid) getFromDB() error {
 		// 查询
 		err := tx.Raw("select max_id, step from uid where business_id = ? for update", u.businessId).Row().Scan(&maxId, &step)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.S().Error("getFromDB err = ", err)
+			zap.S().Error("[getFromDB] [select] [err] = ", err)
 			return err
 		}
 		// 不存在就插入
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			err = tx.Exec("insert into uid(business_id, max_id, step) values(?,?,?)", u.businessId, u.maxId, u.step).Error
 			if err != nil {
-				zap.S().Error("getFromDB err = ", err)
+				zap.S().Error("[getFromDB] [insert] [err] = ", err)
 				return err
 			}
 
@@ -117,14 +117,14 @@ func (u *uid) getFromDB() error {
 			// 存在就更新
 			err = tx.Exec("update uid set max_id = max_id + step where business_id = ?", u.businessId).Error
 			if err != nil {
-				zap.S().Error("getFromDB err = ", err)
+				zap.S().Error("[getFromDB] [update] [err] = ", err)
 				return err
 			}
 		}
 		return nil
 	})
 	if err != nil {
-		zap.S().Error("getFromDB err = ", err)
+		zap.S().Error("[getFromDB] [err] = ", err)
 		return err
 	}
 	if maxId != 0 {

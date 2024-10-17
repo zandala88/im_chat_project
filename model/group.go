@@ -23,7 +23,7 @@ func CreateGroup(group *Group, ids []int64) error {
 	return public.DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(group).Error
 		if err != nil {
-			zap.S().Errorf("CreateGroup failed, err:%v", err)
+			zap.S().Error("[Group] [CreateGroup] [err] = ", err)
 			return err
 		}
 
@@ -42,7 +42,7 @@ func GetGroupById(groupId int64) (*Group, error) {
 	group := new(Group)
 	err := public.DB.First(group, groupId).Error
 	if err != nil {
-		zap.S().Errorf("GetGroupById failed, err:%v", err)
+		zap.S().Error("[Group] [GetGroupById] [err] = ", err)
 		return nil, err
 	}
 	return group, nil
@@ -55,7 +55,7 @@ func GetGroups(userId int64) ([]*Group, error) {
 		Where("group_user.user_id = ?", userId).
 		Find(&groups).Error
 	if err != nil {
-		zap.S().Errorf("GetGroups failed, err:%v", err)
+		zap.S().Error("[Group] [GetGroups] [err] = ", err)
 		return nil, err
 	}
 	return groups, nil
@@ -67,7 +67,7 @@ func IsGroupOwner(userId, groupId int64) (bool, error) {
 		Where("owner_id = ? and id = ?", userId, groupId).
 		Count(&cnt).Error
 	if err != nil {
-		zap.S().Errorf("IsGroupOwner failed, err:%v", err)
+		zap.S().Error("[Group] [IsGroupOwner] [err] = ", err)
 		return false, err
 	}
 	return cnt > 0, nil
@@ -77,13 +77,13 @@ func DeleteGroup(groupId int64) error {
 	return public.DB.Transaction(func(tx *gorm.DB) error {
 		err := tx.Where("group_id = ?", groupId).Delete(&GroupUser{}).Error
 		if err != nil {
-			zap.S().Errorf("DeleteGroup failed, err:%v", err)
+			zap.S().Error("[Group] [DeleteGroup] [err] = ", err)
 			return err
 		}
 
 		err = tx.Delete(&Group{}, groupId).Error
 		if err != nil {
-			zap.S().Errorf("DeleteGroup failed, err:%v", err)
+			zap.S().Error("[Group] [DeleteGroup] [err] = ", err)
 			return err
 		}
 		return nil

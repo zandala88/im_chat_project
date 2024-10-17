@@ -24,7 +24,7 @@ func SetUserOnline(userId int64, addr string) error {
 	key := getUserKey(userId)
 	_, err := public.Redis.Set(context.Background(), key, addr, ttl1D*time.Second).Result()
 	if err != nil {
-		zap.S().Error("[设置用户在线] 错误, err:", err)
+		zap.S().Error("[SetUserOnline] err = ", err)
 		return err
 	}
 	return nil
@@ -36,7 +36,7 @@ func GetUserOnline(userId int64) (string, error) {
 	key := getUserKey(userId)
 	addr, err := public.Redis.Get(context.Background(), key).Result()
 	if err != nil && !errors.Is(err, redis.Nil) {
-		zap.S().Error("[获取用户在线] 错误，err:", err)
+		zap.S().Error("[GetUserOnline] err = ", err)
 		return "", err
 	}
 	return addr, nil
@@ -47,7 +47,7 @@ func DelUserOnline(userId int64) error {
 	key := getUserKey(userId)
 	_, err := public.Redis.Del(context.Background(), key).Result()
 	if err != nil {
-		zap.S().Error("[删除用户在线] 错误, err:", err)
+		zap.S().Error("[DelUserOnline] err = ", err)
 		return err
 	}
 	return nil

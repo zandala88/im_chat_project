@@ -24,7 +24,7 @@ func IsFriend(userId, friendId int64) (bool, error) {
 		Where("user_id = ? and friend_id = ?", userId, friendId).
 		Count(&cnt).Error
 	if err != nil {
-		zap.S().Errorf("IsFriend failed, err:%v", err)
+		zap.S().Error("[Friend] [IsFriend] [err] = ", err)
 		return false, err
 	}
 	return cnt > 0, nil
@@ -33,7 +33,7 @@ func IsFriend(userId, friendId int64) (bool, error) {
 func CreateFriend(friend ...*Friend) error {
 	err := public.DB.Create(friend).Error
 	if err != nil {
-		zap.S().Errorf("CreateFriend failed, err:%v", err)
+		zap.S().Error("[Friend] [CreateFriend] [err] = ", err)
 		return err
 	}
 	return nil
