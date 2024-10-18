@@ -28,7 +28,8 @@ func AddFriend(c *gin.Context) {
 	}
 
 	// 查询用户是否存在
-	ub, err := model.GetUserById(friendId)
+	userRepo := model.NewUserRepo(c)
+	ub, err := userRepo.GetUserById(friendId)
 	if err != nil {
 		zap.S().Error("[AddFriend] [model.GetUserById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
@@ -36,7 +37,8 @@ func AddFriend(c *gin.Context) {
 	}
 
 	// 查询是否已建立好友关系
-	isFriend, err := model.IsFriend(userId, ub.ID)
+	friendRepo := model.NewFriendRepo(c)
+	isFriend, err := friendRepo.IsFriend(userId, ub.ID)
 	if err != nil {
 		zap.S().Error("[AddFriend] [model.IsFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -49,7 +51,7 @@ func AddFriend(c *gin.Context) {
 	}
 
 	// 建立好友关系
-	err = model.CreateFriend(&model.Friend{
+	err = friendRepo.CreateFriend(&model.Friend{
 		UserID:   userId,
 		FriendID: ub.ID,
 	}, &model.Friend{
@@ -67,7 +69,8 @@ func AddFriend(c *gin.Context) {
 
 func FriendList(c *gin.Context) {
 	userId := util.GetUid(c)
-	friends, err := model.GetFriends(userId)
+	userRepo := model.NewUserRepo(c)
+	friends, err := userRepo.GetFriends(userId)
 	if err != nil {
 		zap.S().Error("[FriendList] [model.GetFriends] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -98,7 +101,8 @@ func DeleteFriend(c *gin.Context) {
 	}
 
 	// 查询用户是否存在
-	ub, err := model.GetUserById(friendId)
+	userRepo := model.NewUserRepo(c)
+	ub, err := userRepo.GetUserById(friendId)
 	if err != nil {
 		zap.S().Error("[DeleteFriend] [model.GetUserById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
@@ -106,7 +110,8 @@ func DeleteFriend(c *gin.Context) {
 	}
 
 	// 查询是否已建立好友关系
-	isFriend, err := model.IsFriend(userId, ub.ID)
+	friendRepo := model.NewFriendRepo(c)
+	isFriend, err := friendRepo.IsFriend(userId, ub.ID)
 	if err != nil {
 		zap.S().Error("[DeleteFriend] [model.IsFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -119,7 +124,7 @@ func DeleteFriend(c *gin.Context) {
 	}
 
 	// 删除好友关系
-	err = model.DeleteFriend(userId, ub.ID)
+	err = userRepo.DeleteFriend(userId, ub.ID)
 	if err != nil {
 		zap.S().Error("[DeleteFriend] [model.DeleteFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)

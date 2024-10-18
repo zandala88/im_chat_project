@@ -21,7 +21,8 @@ func Register(c *gin.Context) {
 	}
 
 	// 查询手机号是否已存在
-	cnt, err := model.GetUserCountByPhone(phoneNumber)
+	userRepo := model.NewUserRepo(c)
+	cnt, err := userRepo.GetUserCountByPhone(phoneNumber)
 	if err != nil {
 		zap.S().Error("[Register] [model.GetUserCountByPhone] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -39,7 +40,7 @@ func Register(c *gin.Context) {
 		Nickname:    nickname,
 		Password:    util.GetMD5(password),
 	}
-	err = model.CreateUser(ub)
+	err = userRepo.CreateUser(ub)
 	if err != nil {
 		zap.S().Error("[Register] [model.CreateUser] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -73,7 +74,8 @@ func Login(c *gin.Context) {
 	}
 
 	// 验证账号名和密码是否正确
-	ub, err := model.GetUserByPhoneAndPassword(phoneNumber, util.GetMD5(password))
+	userRepo := model.NewUserRepo(c)
+	ub, err := userRepo.GetUserByPhoneAndPassword(phoneNumber, util.GetMD5(password))
 	if err != nil {
 		zap.S().Error("[Login] [model.GetUserByPhoneAndPassword] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)

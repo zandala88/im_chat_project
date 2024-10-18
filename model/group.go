@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"im/public"
@@ -19,8 +20,20 @@ func (*Group) TableName() string {
 	return "group"
 }
 
-func CreateGroup(group *Group, ids []int64) error {
-	return public.DB.Transaction(func(tx *gorm.DB) error {
+type GroupRepo struct {
+	db  *gorm.DB
+	ctx context.Context
+}
+
+func NewGroupRepo(ctx context.Context) *GroupRepo {
+	return &GroupRepo{
+		db:  public.DB.WithContext(ctx),
+		ctx: ctx,
+	}
+}
+
+func (g *GroupRepo) CreateGroup(group *Group, ids []int64) error {
+	return g.db.Transaction(func(tx *gorm.DB) error {
 		err := tx.Create(group).Error
 		if err != nil {
 			zap.S().Error("[Group] [CreateGroup] [err] = ", err)
@@ -38,9 +51,9 @@ func CreateGroup(group *Group, ids []int64) error {
 	})
 }
 
-func GetGroupById(groupId int64) (*Group, error) {
-	group := new(Group)
-	err := public.DB.First(group, groupId).Error
+func (g *GroupRepo) GetGroupById(groupId int64) (*Group, error) {
+	var group = &Group{}
+	err := g.db.First(group, groupId).Error
 	if err != nil {
 		zap.S().Error("[Group] [GetGroupById] [err] = ", err)
 		return nil, err
@@ -48,9 +61,9 @@ func GetGroupById(groupId int64) (*Group, error) {
 	return group, nil
 }
 
-func GetGroups(userId int64) ([]*Group, error) {
-	groups := make([]*Group, 0)
-	err := public.DB.Table("group").
+func (g *GroupRepo) GetGroups(userId int64) ([]*Group, error) {
+	var groups = make([]*Group, 0)
+	err := g.db.Table("group").
 		Joins("join group_user on group.id = group_user.group_id").
 		Where("group_user.user_id = ?", userId).
 		Find(&groups).Error
@@ -61,9 +74,9 @@ func GetGroups(userId int64) ([]*Group, error) {
 	return groups, nil
 }
 
-func IsGroupOwner(userId, groupId int64) (bool, error) {
+func (g *GroupRepo) IsGroupOwner(userId, groupId int64) (bool, error) {
 	var cnt int64
-	err := public.DB.Model(&Group{}).
+	err := g.db.Model(&Group{}).
 		Where("owner_id = ? and id = ?", userId, groupId).
 		Count(&cnt).Error
 	if err != nil {
@@ -73,8 +86,8 @@ func IsGroupOwner(userId, groupId int64) (bool, error) {
 	return cnt > 0, nil
 }
 
-func DeleteGroup(groupId int64) error {
-	return public.DB.Transaction(func(tx *gorm.DB) error {
+func (g *GroupRepo) DeleteGroup(groupId int64) error {
+	return g.db.Transaction(func(tx *gorm.DB) error {
 		err := tx.Where("group_id = ?", groupId).Delete(&GroupUser{}).Error
 		if err != nil {
 			zap.S().Error("[Group] [DeleteGroup] [err] = ", err)

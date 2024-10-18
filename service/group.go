@@ -29,7 +29,8 @@ func CreateGroup(c *gin.Context) {
 	ids = append(ids, userId)
 
 	// 获取 ids 用户信息
-	ids, err := model.GetUserIdByIds(ids)
+	userRepo := model.NewUserRepo(c)
+	ids, err := userRepo.GetUserIdByIds(ids)
 	if err != nil {
 		zap.S().Error("[CreateGroup] [model.GetUserIdByIds] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -41,7 +42,8 @@ func CreateGroup(c *gin.Context) {
 		Name:    name,
 		OwnerID: userId,
 	}
-	err = model.CreateGroup(group, ids)
+	groupRepo := model.NewGroupRepo(c)
+	err = groupRepo.CreateGroup(group, ids)
 	if err != nil {
 		zap.S().Error("[CreateGroup] [model.CreateGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -63,7 +65,8 @@ func CreateGroup(c *gin.Context) {
 
 func GroupList(c *gin.Context) {
 	userId := util.GetUid(c)
-	groups, err := model.GetGroups(userId)
+	groupRepo := model.NewGroupRepo(c)
+	groups, err := groupRepo.GetGroups(userId)
 	if err != nil {
 		zap.S().Error("[GroupList] [model.GetGroups] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -83,7 +86,8 @@ func JoinGroup(c *gin.Context) {
 	}
 
 	// 查看群是否存在
-	_, err := model.GetGroupById(groupId)
+	groupRepo := model.NewGroupRepo(c)
+	_, err := groupRepo.GetGroupById(groupId)
 	if err != nil {
 		zap.S().Error("[JoinGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -92,7 +96,8 @@ func JoinGroup(c *gin.Context) {
 
 	// 查看用户是否已经在群里
 	userId := util.GetUid(c)
-	isBelong, err := model.IsBelongToGroup(userId, groupId)
+	groupUserRepo := model.NewGroupUserRepo(c)
+	isBelong, err := groupUserRepo.IsBelongToGroup(userId, groupId)
 	if err != nil {
 		zap.S().Error("[JoinGroup] [model.IsBelongToGroup] 获取群组失败 [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -105,7 +110,7 @@ func JoinGroup(c *gin.Context) {
 	}
 
 	// 加入群组
-	err = model.JoinGroup(groupId, userId)
+	err = groupUserRepo.JoinGroup(groupId, userId)
 	if err != nil {
 		zap.S().Error("[JoinGroup] [model.JoinGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -133,7 +138,8 @@ func ExitGroup(c *gin.Context) {
 	}
 
 	// 查看群是否存在
-	_, err := model.GetGroupById(groupId)
+	groupRepo := model.NewGroupRepo(c)
+	_, err := groupRepo.GetGroupById(groupId)
 	if err != nil {
 		zap.S().Error("[ExitGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -142,7 +148,8 @@ func ExitGroup(c *gin.Context) {
 
 	// 查看用户是否在群里
 	userId := util.GetUid(c)
-	isBelong, err := model.IsBelongToGroup(userId, groupId)
+	groupUserRepo := model.NewGroupUserRepo(c)
+	isBelong, err := groupUserRepo.IsBelongToGroup(userId, groupId)
 	if err != nil {
 		zap.S().Error("[ExitGroup] [model.IsBelongToGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -155,7 +162,7 @@ func ExitGroup(c *gin.Context) {
 	}
 
 	// 退出群组
-	err = model.ExitGroup(groupId, userId)
+	err = groupUserRepo.ExitGroup(groupId, userId)
 	if err != nil {
 		zap.S().Error("[ExitGroup] [model.ExitGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -183,7 +190,8 @@ func DeleteGroup(c *gin.Context) {
 	}
 
 	// 查看群是否存在
-	_, err := model.GetGroupById(groupId)
+	groupRepo := model.NewGroupRepo(c)
+	_, err := groupRepo.GetGroupById(groupId)
 	if err != nil {
 		zap.S().Error("[DeleteGroup] [model.GetGroupById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -192,7 +200,7 @@ func DeleteGroup(c *gin.Context) {
 
 	// 查看用户是否是群主
 	userId := util.GetUid(c)
-	isOwner, err := model.IsGroupOwner(userId, groupId)
+	isOwner, err := groupRepo.IsGroupOwner(userId, groupId)
 	if err != nil {
 		zap.S().Error("[DeleteGroup] [model.IsGroupOwner] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -205,7 +213,7 @@ func DeleteGroup(c *gin.Context) {
 	}
 
 	// 删除群组
-	err = model.DeleteGroup(groupId)
+	err = groupRepo.DeleteGroup(groupId)
 	if err != nil {
 		zap.S().Error("[DeleteGroup] [model.DeleteGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)

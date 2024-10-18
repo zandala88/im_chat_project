@@ -1,7 +1,9 @@
 package model
 
 import (
+	"context"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"im/public"
 	"time"
 )
@@ -18,10 +20,22 @@ func (*GroupUser) TableName() string {
 	return "group_user"
 }
 
+type GroupUserRepo struct {
+	db  *gorm.DB
+	ctx context.Context
+}
+
+func NewGroupUserRepo(ctx context.Context) *GroupUserRepo {
+	return &GroupUserRepo{
+		db:  public.DB.WithContext(ctx),
+		ctx: ctx,
+	}
+}
+
 // IsBelongToGroup 验证用户是否属于群
-func IsBelongToGroup(userId, groupId int64) (bool, error) {
+func (g *GroupUserRepo) IsBelongToGroup(userId, groupId int64) (bool, error) {
 	var cnt int64
-	err := public.DB.Model(&GroupUser{}).
+	err := g.db.Model(&GroupUser{}).
 		Where("user_id = ? and group_id = ?", userId, groupId).
 		Count(&cnt).Error
 	if err != nil {
@@ -31,9 +45,9 @@ func IsBelongToGroup(userId, groupId int64) (bool, error) {
 	return cnt > 0, nil
 }
 
-func GetGroupUserIdsByGroupId(groupId int64) ([]int64, error) {
+func (g *GroupUserRepo) GetGroupUserIdsByGroupId(groupId int64) ([]int64, error) {
 	var ids []int64
-	err := public.DB.Model(&GroupUser{}).
+	err := g.db.Model(&GroupUser{}).
 		Where("group_id = ?", groupId).Pluck("user_id", &ids).Error
 	if err != nil {
 		zap.S().Error("[GroupUser] [GetGroupUserIdsByGroupId] [err] = ", err)
@@ -42,8 +56,8 @@ func GetGroupUserIdsByGroupId(groupId int64) ([]int64, error) {
 	return ids, nil
 }
 
-func JoinGroup(groupId, userId int64) error {
-	err := public.DB.Create(&GroupUser{
+func (g *GroupUserRepo) JoinGroup(groupId, userId int64) error {
+	err := g.db.Create(&GroupUser{
 		GroupID: groupId,
 		UserID:  userId,
 	}).Error
@@ -54,8 +68,8 @@ func JoinGroup(groupId, userId int64) error {
 	return nil
 }
 
-func ExitGroup(groupId, userId int64) error {
-	err := public.DB.Where("group_id = ? and user_id = ?", groupId, userId).Delete(&GroupUser{}).Error
+func (g *GroupUserRepo) ExitGroup(groupId, userId int64) error {
+	err := g.db.Where("group_id = ? and user_id = ?", groupId, userId).Delete(&GroupUser{}).Error
 	if err != nil {
 		zap.S().Error("[GroupUser] [ExitGroup] [err] = ", err)
 		return err

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
@@ -22,7 +23,8 @@ func GroupUserList(c *gin.Context) {
 	userId := util.GetUid(c)
 
 	// 验证用户是否属于该群
-	isBelong, err := model.IsBelongToGroup(userId, groupId)
+	groupUserRepo := model.NewGroupUserRepo(c)
+	isBelong, err := groupUserRepo.IsBelongToGroup(userId, groupId)
 	if err != nil {
 		zap.S().Error("[GroupUserList] [model.IsBelongToGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
@@ -62,7 +64,8 @@ func GetGroupUser(groupId int64) ([]int64, error) {
 		return userIds, nil
 	}
 
-	userIds, err = model.GetGroupUserIdsByGroupId(groupId)
+	groupUserRepo := model.NewGroupUserRepo(context.Background())
+	userIds, err = groupUserRepo.GetGroupUserIdsByGroupId(groupId)
 	if err != nil {
 		zap.S().Error("[GetGroupUser] [model.GetGroupUserIdsByGroupId] [err] = ", err.Error())
 		return nil, err
