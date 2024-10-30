@@ -2,8 +2,6 @@ package main
 
 import (
 	"im/config"
-	"im/model"
-	"im/public"
 	_ "im/public"
 	"im/public/etcd"
 	"im/router"
@@ -21,10 +19,6 @@ func main() {
 
 	// 启动 rpc 服务
 	go rpc_server.InitRPCServer()
-
-	public.DB.AutoMigrate(&model.Group{},
-		&model.GroupUser{}, &model.Friend{}, &model.Message{},
-		&model.User{}, &model.UID{})
 
 	// 启动 websocket 服务
 	router.WSRouter()
