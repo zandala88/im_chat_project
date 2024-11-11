@@ -119,3 +119,14 @@ func (u *UserRepo) DeleteFriend(userId, friendId int64) error {
 	}
 	return nil
 }
+
+func (u *UserRepo) CheckFriendIn(userId int64, friends []int64) (bool, error) {
+	var count int64
+	err := u.db.Model(&Friend{}).Where("user_id = ?", userId).
+		Where("friend_id IN ?", friends).Count(&count).Error
+	if err != nil {
+		zap.S().Error("[User] [CheckFriendIn] [err] = ", err)
+		return false, err
+	}
+	return len(friends) == int(count), nil
+}

@@ -25,21 +25,28 @@ func CreateGroup(c *gin.Context) {
 		zap.S().Debugf("[CreateGroup] [idsStr][%d] = %s", i, idsStr[i])
 		ids = append(ids, cast.ToInt64(idsStr[i]))
 	}
+	if len(ids) == 0 {
+		zap.S().Error("[CreateGroup] 参数不正确")
+		util.FailRespWithCode(c, util.ShouldBindJSONError)
+		return
+	}
 
-	// 获取用户信息
-	userId := util.GetUid(c)
-	ids = append(ids, userId)
-
-	// 获取 ids 用户信息
+	// 判断添加的用户是否都是好友
 	userRepo := model.NewUserRepo(c)
-	ids, err := userRepo.GetUserIdByIds(ids)
+	userId := util.GetUid(c)
+	in, err := userRepo.CheckFriendIn(userId, ids)
 	if err != nil {
-		zap.S().Error("[CreateGroup] [model.GetUserIdByIds] [err] = ", err.Error())
+		zap.S().Error("[CreateGroup] [model.CheckFriendIn] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
-	zap.S().Info("[CreateGroup] [ids] = ", ids)
+	if !in {
+		zap.S().Error("[CreateGroup] 参数不正确")
+		util.FailRespWithCode(c, util.ShouldBindJSONError)
+		return
+	}
 
+	ids = append(ids, userId)
 	// 创建群组
 	group := &model.Group{
 		Name:    name,
