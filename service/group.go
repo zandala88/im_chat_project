@@ -22,6 +22,7 @@ func CreateGroup(c *gin.Context) {
 	zap.S().Debug("[CreateGroup] [idsStr] = ", idsStr)
 	ids := make([]int64, 0, len(idsStr)+1)
 	for i := range idsStr {
+		zap.S().Debugf("[CreateGroup] [idsStr][%d] = %s", i, idsStr[i])
 		ids = append(ids, cast.ToInt64(idsStr[i]))
 	}
 
