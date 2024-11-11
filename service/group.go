@@ -19,6 +19,7 @@ func CreateGroup(c *gin.Context) {
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
+	zap.S().Debug("[CreateGroup] [idsStr] = ", idsStr)
 	ids := make([]int64, 0, len(idsStr)+1)
 	for i := range idsStr {
 		ids = append(ids, cast.ToInt64(idsStr[i]))
