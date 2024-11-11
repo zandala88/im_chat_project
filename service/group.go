@@ -36,6 +36,7 @@ func CreateGroup(c *gin.Context) {
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
+	zap.S().Info("[CreateGroup] [ids] = ", ids)
 
 	// 创建群组
 	group := &model.Group{
