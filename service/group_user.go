@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
@@ -15,21 +16,22 @@ func GroupUserList(c *gin.Context) {
 	groupIdStr := c.Query("group_id")
 	groupId := cast.ToInt64(groupIdStr)
 	if groupId == 0 {
-		zap.S().Error("GroupUserList 参数不正确")
+		zap.S().Error("[GroupUserList] groupId == 0")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 	userId := util.GetUid(c)
 
 	// 验证用户是否属于该群
-	isBelong, err := model.IsBelongToGroup(userId, groupId)
+	groupUserRepo := model.NewGroupUserRepo(c)
+	isBelong, err := groupUserRepo.IsBelongToGroup(userId, groupId)
 	if err != nil {
-		zap.S().Error("GroupUserList 系统错误", err.Error())
+		zap.S().Error("[GroupUserList] [model.IsBelongToGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if !isBelong {
-		zap.S().Error("GroupUserList 用户不属于该群")
+		zap.S().Error("[GroupUserList] isBelong == false")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -37,7 +39,7 @@ func GroupUserList(c *gin.Context) {
 	// 获取群成员id列表
 	ids, err := GetGroupUser(groupId)
 	if err != nil {
-		zap.S().Error("GroupUserList 系统错误", err.Error())
+		zap.S().Error("[GroupUserList] [GetGroupUser] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -55,21 +57,22 @@ func GroupUserList(c *gin.Context) {
 func GetGroupUser(groupId int64) ([]int64, error) {
 	userIds, err := cache.GetGroupUser(groupId)
 	if err != nil {
-		zap.S().Error("GetGroupUser 缓存错误", err.Error())
+		zap.S().Error("[GetGroupUser] [cache.GetGroupUser] [err] = ", err.Error())
 		return nil, err
 	}
 	if len(userIds) != 0 {
 		return userIds, nil
 	}
 
-	userIds, err = model.GetGroupUserIdsByGroupId(groupId)
+	groupUserRepo := model.NewGroupUserRepo(context.Background())
+	userIds, err = groupUserRepo.GetGroupUserIdsByGroupId(groupId)
 	if err != nil {
-		zap.S().Error("GetGroupUser 获取群成员错误", err.Error())
+		zap.S().Error("[GetGroupUser] [model.GetGroupUserIdsByGroupId] [err] = ", err.Error())
 		return nil, err
 	}
 	err = cache.SetGroupUser(groupId, userIds)
 	if err != nil {
-		zap.S().Error("GetGroupUser 缓存错误", err.Error())
+		zap.S().Error("[GetGroupUser] [cache.SetGroupUser] [err] = ", err.Error())
 		return nil, err
 	}
 

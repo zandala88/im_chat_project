@@ -24,7 +24,7 @@ func GetNextSeqId(objectType int8, objectId int64) (int64, error) {
 	key := getSeqKey(objectType, objectId)
 	result, err := public.Redis.Incr(context.Background(), key).Result()
 	if err != nil {
-		zap.S().Error("[获取seq] 失败，err:", err)
+		zap.S().Error("[GetNextSeqId] err = ", err)
 		return 0, err
 	}
 	return result, nil
@@ -45,7 +45,7 @@ func GetNextSeqIds(objectType int8, objectIds []int64) ([]int64, error) {
 	}
 	res, err := redis.NewScript(script).Run(context.Background(), public.Redis, keys).Result()
 	if err != nil {
-		zap.S().Error("[获取seq] 失败，err:", err)
+		zap.S().Error("[GetNextSeqIds] err = ", err)
 		return nil, err
 	}
 	results := make([]int64, len(objectIds))

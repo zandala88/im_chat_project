@@ -16,7 +16,7 @@ func GetServerClient(addr string) protocol.ConnectClient {
 	// todo 安全连接？
 	client, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		zap.S().Error("grpc client Dial err, err:", err)
+		zap.S().Error("[GetServerClient] [grpc.Dial] [err] = ", err.Error())
 		panic(err)
 	}
 	ConnServerClient = protocol.NewConnectClient(client)

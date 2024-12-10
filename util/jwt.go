@@ -35,7 +35,7 @@ func VerifyJWT(tokenString string) (*MyClaims, error) {
 		return []byte(config.Configs.Auth.AccessSecret), nil
 	})
 	if err != nil {
-		zap.S().Errorf("解析token失败: %v", err)
+		zap.S().Errorf("[VerifyJWT] 解析token失败: %v", err)
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*MyClaims); ok && token.Valid { // 校验token
@@ -47,7 +47,7 @@ func VerifyJWT(tokenString string) (*MyClaims, error) {
 func GetUid(c *gin.Context) int64 {
 	value, exists := c.Get("user_id")
 	if !exists {
-		zap.S().Info("ctx获取userId失败")
+		zap.S().Info("[GetUid] ctx获取userId失败")
 	}
 	return cast.ToInt64(value)
 }

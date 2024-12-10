@@ -47,7 +47,7 @@ func WSRouter() {
 		// 升级协议  http -> websocket
 		WsConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
-			zap.S().Error("websocket conn err : ", err)
+			zap.S().Error("[WSRouter] [upgrader.Upgrade] [err] = ", err)
 			return
 		}
 
@@ -65,9 +65,10 @@ func WSRouter() {
 	}
 
 	go func() {
-		zap.S().Info("websocket 启动：", srv.Addr)
+		zap.S().Info("[WSRouter] websocket 启动：", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			zap.S().Fatalf("websocket listen: %s\n", err)
+			zap.S().Error("[WSRouter] [ListenAndServe] [err] = ", err)
 		}
 	}()
 
@@ -85,8 +86,8 @@ func WSRouter() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		zap.S().Fatal("Server Shutdown: ", err)
+		zap.S().Error("[WSRouter] [Shutdown] [err] = ", err)
 	}
 
-	zap.S().Info("Server exiting")
+	zap.S().Info("[WSRouter] Server exiting")
 }

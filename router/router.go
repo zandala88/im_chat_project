@@ -14,7 +14,6 @@ import (
 // HTTPRouter http 路由
 func HTTPRouter() {
 	r := gin.Default()
-
 	gin.SetMode(gin.DebugMode)
 
 	// 用户注册

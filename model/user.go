@@ -1,7 +1,9 @@
 package model
 
 import (
+	"context"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"im/public"
 	"time"
 )
@@ -19,48 +21,60 @@ func (*User) TableName() string {
 	return "user"
 }
 
-func GetUserCountByPhone(phoneNumber string) (int64, error) {
+type UserRepo struct {
+	db  *gorm.DB
+	ctx context.Context
+}
+
+func NewUserRepo(ctx context.Context) *UserRepo {
+	return &UserRepo{
+		db:  public.DB.WithContext(ctx),
+		ctx: ctx,
+	}
+}
+
+func (u *UserRepo) GetUserCountByPhone(phoneNumber string) (int64, error) {
 	var cnt int64
-	err := public.DB.Model(&User{}).
+	err := u.db.Model(&User{}).
 		Where("phone_number = ?", phoneNumber).Count(&cnt).Error
 	if err != nil {
-		zap.S().Errorf("GetUserCountByPhone failed, err:%v", err)
+		zap.S().Error("[User] [GetUserCountByPhone] [err] = ", err)
 		return 0, err
 	}
 	return cnt, nil
 }
 
-func CreateUser(user *User) error {
-	err := public.DB.Create(user).Error
+func (u *UserRepo) CreateUser(user *User) error {
+	err := u.db.Create(user).Error
 	if err != nil {
-		zap.S().Errorf("CreateUser failed, err:%v", err)
+		zap.S().Error("[User] [CreateUser] [err] = ", err)
 		return err
 	}
 	return nil
 }
 
-func GetUserByPhoneAndPassword(phoneNumber, password string) (*User, error) {
+func (u *UserRepo) GetUserByPhoneAndPassword(phoneNumber, password string) (*User, error) {
 	user := &User{}
-	err := public.DB.Model(&User{}).
+	err := u.db.Model(&User{}).
 		Where("phone_number = ? and password = ?", phoneNumber, password).First(user).Error
 	if err != nil {
-		zap.S().Errorf("GetUserByPhoneAndPassword failed, err:%v", err)
+		zap.S().Error("[User] [GetUserByPhoneAndPassword] [err] = ", err)
 		return nil, err
 	}
 	return user, nil
 }
 
-func GetUserById(id int64) (*User, error) {
+func (u *UserRepo) GetUserById(id int64) (*User, error) {
 	user := &User{}
-	err := public.DB.Model(&User{}).Where("id = ?", id).First(user).Error
+	err := u.db.Model(&User{}).Where("id = ?", id).First(user).Error
 	if err != nil {
-		zap.S().Errorf("GetUserById failed, err:%v", err)
+		zap.S().Error("[User] [GetUserById] [err] = ", err)
 		return nil, err
 	}
 	return user, err
 }
 
-func GetUserIdByIds(ids []int64) ([]int64, error) {
+func (u *UserRepo) GetUserIdByIds(ids []int64) ([]int64, error) {
 	var newIds []int64
 	m := make(map[int64]struct{}, len(ids))
 	for i := 0; i < len(ids); i += 1000 {
@@ -72,6 +86,7 @@ func GetUserIdByIds(ids []int64) ([]int64, error) {
 		subIds := ids[i:end]
 		err := public.DB.Model(&User{}).Where("id in ?", subIds).Pluck("id", &tmp).Error
 		if err != nil {
+			zap.S().Error("[User] [GetUserIdByIds] [err] = ", err)
 			return nil, err
 		}
 		for _, id := range tmp {
@@ -84,23 +99,34 @@ func GetUserIdByIds(ids []int64) ([]int64, error) {
 	return newIds, nil
 }
 
-func GetFriends(userId int64) ([]*User, error) {
+func (u *UserRepo) GetFriends(userId int64) ([]*User, error) {
 	var users []*User
-	err := public.DB.Raw("select * from user where id in (select friend_id from friend where user_id = ?)", userId).Scan(&users).Error
+	err := u.db.Raw("select * from user where id in (select friend_id from friend where user_id = ?)", userId).Scan(&users).Error
 	if err != nil {
-		zap.S().Errorf("GetFriends failed, err:%v", err)
+		zap.S().Error("[User] [GetFriends] [err] = ", err)
 		return nil, err
 	}
 	return users, nil
 }
 
-func DeleteFriend(userId, friendId int64) error {
-	err := public.DB.Where("user_id = ? and friend_id = ?", userId, friendId).
+func (u *UserRepo) DeleteFriend(userId, friendId int64) error {
+	err := u.db.Where("user_id = ? and friend_id = ?", userId, friendId).
 		Or("user_id = ? and friend_id = ?", friendId, userId).
 		Delete(&Friend{}).Error
 	if err != nil {
-		zap.S().Errorf("DeleteFriend failed, err:%v", err)
+		zap.S().Error("[User] [DeleteFriend] [err] = ", err)
 		return err
 	}
 	return nil
+}
+
+func (u *UserRepo) CheckFriendIn(userId int64, friends []int64) (bool, error) {
+	var count int64
+	err := u.db.Model(&Friend{}).Where("user_id = ?", userId).
+		Where("friend_id IN ?", friends).Count(&count).Error
+	if err != nil {
+		zap.S().Error("[User] [CheckFriendIn] [err] = ", err)
+		return false, err
+	}
+	return len(friends) == int(count), nil
 }

@@ -9,7 +9,6 @@ import (
 	"im/config"
 	"im/public/protocol"
 	"im/service/ws"
-	"log"
 	"net"
 )
 
@@ -23,7 +22,7 @@ func (*ConnectServer) DeliverMessage(ctx context.Context, req *protocol.DeliverM
 	// 获取本地连接
 	conn := ws.GetServer().GetConn(req.ReceiverId)
 	if conn == nil || conn.GetUserId() != req.ReceiverId {
-		zap.S().Debug("[DeliverMessage] 连接不存在 user_id:", req.ReceiverId)
+		zap.S().Debug("[DeliverMessage] [ws.GetServer().GetConn] [userId] = ", req.ReceiverId)
 		return resp, nil
 	}
 
@@ -50,11 +49,11 @@ func InitRPCServer() {
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", rpcPort))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		zap.S().Error("[InitRPCServer] [Listen] [err] = ", err)
 	}
-	zap.S().Debug("rpc server 启动 ", rpcPort)
+	zap.S().Debug("")
 
 	if err := server.Serve(listen); err != nil {
-		log.Fatalf("failed to rpc serve: %v", err)
+		zap.S().Error("[InitRPCServer] [Serve] [err] = ", err)
 	}
 }

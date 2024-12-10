@@ -14,7 +14,7 @@ func AddFriend(c *gin.Context) {
 	friendIdStr := c.PostForm("friend_id")
 	friendId := cast.ToInt64(friendIdStr)
 	if friendId == 0 {
-		zap.S().Error("AddFriend 参数不正确")
+		zap.S().Error("[AddFriend] friendId == 0 ")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -22,34 +22,36 @@ func AddFriend(c *gin.Context) {
 	// 获取自己的信息
 	userId := util.GetUid(c)
 	if userId == friendId {
-		zap.S().Error("AddFriend 不能添加自己为好友")
+		zap.S().Error("[AddFriend] userId == friendId")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 查询用户是否存在
-	ub, err := model.GetUserById(friendId)
+	userRepo := model.NewUserRepo(c)
+	ub, err := userRepo.GetUserById(friendId)
 	if err != nil {
-		zap.S().Error("AddFriend 好友不存在")
+		zap.S().Error("[AddFriend] [model.GetUserById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 查询是否已建立好友关系
-	isFriend, err := model.IsFriend(userId, ub.ID)
+	friendRepo := model.NewFriendRepo(c)
+	isFriend, err := friendRepo.IsFriend(userId, ub.ID)
 	if err != nil {
-		zap.S().Error("AddFriend 系统错误", err.Error())
+		zap.S().Error("[AddFriend] [model.IsFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if isFriend {
-		zap.S().Error("AddFriend 请勿重复添加")
+		zap.S().Error("[AddFriend] isFriend == true")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 建立好友关系
-	err = model.CreateFriend(&model.Friend{
+	err = friendRepo.CreateFriend(&model.Friend{
 		UserID:   userId,
 		FriendID: ub.ID,
 	}, &model.Friend{
@@ -57,7 +59,7 @@ func AddFriend(c *gin.Context) {
 		FriendID: userId,
 	})
 	if err != nil {
-		zap.S().Error("AddFriend 系统错误", err.Error())
+		zap.S().Error("[AddFriend] [model.CreateFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -67,9 +69,10 @@ func AddFriend(c *gin.Context) {
 
 func FriendList(c *gin.Context) {
 	userId := util.GetUid(c)
-	friends, err := model.GetFriends(userId)
+	userRepo := model.NewUserRepo(c)
+	friends, err := userRepo.GetFriends(userId)
 	if err != nil {
-		zap.S().Error("FriendList 获取好友列表失败", err.Error())
+		zap.S().Error("[FriendList] [model.GetFriends] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
@@ -84,7 +87,7 @@ func DeleteFriend(c *gin.Context) {
 	friendIdStr := c.PostForm("friend_id")
 	friendId := cast.ToInt64(friendIdStr)
 	if friendId == 0 {
-		zap.S().Error("DeleteFriend 参数不正确")
+		zap.S().Error("[DeleteFriend] friend_id == 0")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
@@ -92,36 +95,38 @@ func DeleteFriend(c *gin.Context) {
 	// 获取自己的信息
 	userId := util.GetUid(c)
 	if userId == friendId {
-		zap.S().Error("DeleteFriend 不能删除自己")
+		zap.S().Error("[DeleteFriend] userId == friendId")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 查询用户是否存在
-	ub, err := model.GetUserById(friendId)
+	userRepo := model.NewUserRepo(c)
+	ub, err := userRepo.GetUserById(friendId)
 	if err != nil {
-		zap.S().Error("DeleteFriend 好友不存在")
+		zap.S().Error("[DeleteFriend] [model.GetUserById] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 查询是否已建立好友关系
-	isFriend, err := model.IsFriend(userId, ub.ID)
+	friendRepo := model.NewFriendRepo(c)
+	isFriend, err := friendRepo.IsFriend(userId, ub.ID)
 	if err != nil {
-		zap.S().Error("DeleteFriend 系统错误", err.Error())
+		zap.S().Error("[DeleteFriend] [model.IsFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}
 	if !isFriend {
-		zap.S().Error("DeleteFriend 请勿重复删除")
+		zap.S().Error("[DeleteFriend] isFriend == false")
 		util.FailRespWithCode(c, util.ShouldBindJSONError)
 		return
 	}
 
 	// 删除好友关系
-	err = model.DeleteFriend(userId, ub.ID)
+	err = userRepo.DeleteFriend(userId, ub.ID)
 	if err != nil {
-		zap.S().Error("DeleteFriend 系统错误", err.Error())
+		zap.S().Error("[DeleteFriend] [model.DeleteFriend] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
 		return
 	}

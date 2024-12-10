@@ -75,7 +75,7 @@ func (r *Register) ListenLeaseRespChan() {
 
 	for range r.keepAliveChan {
 	}
-	zap.S().Errorf("续约失败，leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
+	zap.S().Debugf("[ListenLeaseRespChan] [key] = %s [leaseId] = %d [val] = %s", r.key, r.leaseID, r.val)
 }
 
 // Close 撤销租约
@@ -84,6 +84,6 @@ func (r *Register) close() error {
 	if _, err := r.client.Revoke(context.Background(), r.leaseID); err != nil {
 		return err
 	}
-	zap.S().Debug("撤销租约成功, leaseID:%d, Put key:%s,val:%s\n", r.leaseID, r.key, r.val)
+	zap.S().Debugf("[close] 撤销租约成功, [leaseID] = %d [Put key] = %s [val] = %s", r.leaseID, r.key, r.val)
 	return r.client.Close()
 }

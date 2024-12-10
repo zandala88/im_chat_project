@@ -24,15 +24,15 @@ func InitMessageMQ(url string) {
 func MessageCreateHandler(d rabbitmq.Delivery) rabbitmq.Action {
 	messageModels := model.ProtoMarshalToMessage(d.Body)
 	if messageModels == nil {
-		zap.S().Debug("空的")
+		zap.S().Debug("[MessageCreateHandler] messageModels 为空")
 		return rabbitmq.NackDiscard
 	}
 	err := model.CreateMessage(messageModels...)
 	if err != nil {
-		zap.S().Error("[MessageCreateHandler] model.CreateMessage 失败，err:", err)
+		zap.S().Error("[MessageCreateHandler] [CreateMessage] [err] = ", err)
 		return rabbitmq.NackDiscard
 	}
 
-	zap.S().Debug("处理完消息：", string(d.Body))
+	zap.S().Debug("[MessageCreateHandler] [CreateMessage] [messageModels] = ", messageModels)
 	return rabbitmq.Ack
 }

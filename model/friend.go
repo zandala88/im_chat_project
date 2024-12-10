@@ -1,7 +1,9 @@
 package model
 
 import (
+	"context"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"im/public"
 	"time"
 )
@@ -18,22 +20,34 @@ func (*Friend) TableName() string {
 	return "friend"
 }
 
-func IsFriend(userId, friendId int64) (bool, error) {
+type FriendRepo struct {
+	db  *gorm.DB
+	ctx context.Context
+}
+
+func NewFriendRepo(ctx context.Context) *FriendRepo {
+	return &FriendRepo{
+		db:  public.DB.WithContext(ctx),
+		ctx: ctx,
+	}
+}
+
+func (f *FriendRepo) IsFriend(userId, friendId int64) (bool, error) {
 	var cnt int64
-	err := public.DB.Model(&Friend{}).
+	err := f.db.Model(&Friend{}).
 		Where("user_id = ? and friend_id = ?", userId, friendId).
 		Count(&cnt).Error
 	if err != nil {
-		zap.S().Errorf("IsFriend failed, err:%v", err)
+		zap.S().Error("[Friend] [IsFriend] [err] = ", err)
 		return false, err
 	}
 	return cnt > 0, nil
 }
 
-func CreateFriend(friend ...*Friend) error {
-	err := public.DB.Create(friend).Error
+func (f *FriendRepo) CreateFriend(friend ...*Friend) error {
+	err := f.db.Create(friend).Error
 	if err != nil {
-		zap.S().Errorf("CreateFriend failed, err:%v", err)
+		zap.S().Error("[Friend] [CreateFriend] [err] = ", err)
 		return err
 	}
 	return nil

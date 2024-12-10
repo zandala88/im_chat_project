@@ -3,6 +3,7 @@ package public
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 	"im/config"
 )
 
@@ -18,6 +19,7 @@ func init() {
 		MaxRetries:   config.Configs.Redis.MaxRetries,
 	})
 	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		zap.S().Error("[init] [redisClient.Ping] [err] = ", err.Error())
 		panic(err)
 	}
 	Redis = redisClient
