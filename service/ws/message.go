@@ -41,7 +41,8 @@ func GetOutputMsg(cmdType protocol.CmdType, code int32, message proto.Message) (
 		zap.S().Error("[GetOutputMsg] output marshal err:", err)
 		return nil, err
 	}
-	zap.S().Debugf("[GetOutputMsg] bytes:%s", string(bytes))
+	zap.S().Debugf("[GetOutputMsg] bytes1:%q", bytes)
+	zap.S().Debugf("[GetOutputMsg] bytes2:%x", bytes)
 	return bytes, nil
 }
 
