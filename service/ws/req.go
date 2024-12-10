@@ -70,6 +70,7 @@ func (r *Req) Login() {
 		zap.S().Error("[用户登录] proto.Marshal err:", err)
 		return
 	}
+	zap.S().Debugf("[用户登录] 回复ACK bytes = %s", bytes)
 
 	// 回复发送 Login 请求的客户端
 	r.conn.SendMsg(userClaims.UserId, bytes)

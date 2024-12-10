@@ -67,13 +67,15 @@ func WSRouter() {
 	go func() {
 		zap.S().Info("websocket 启动：", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			zap.S().Fatalf("listen: %s\n", err)
+			zap.S().Fatalf("websocket listen: %s\n", err)
 		}
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+
+	zap.S().Info("Shutdown Websocket Server ...")
 
 	// 关闭服务
 	server.Stop()
