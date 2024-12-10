@@ -49,8 +49,8 @@ func (c *Conn) Start() {
 	go c.StartReader()
 
 	// 开启用于写回客户端数据流程的 goroutine
-	//go c.StartWriter()
-	go c.StartWriterWithBuffer()
+	go c.StartWriter()
+	//go c.StartWriterWithBuffer()
 }
 
 // StartReader 用于从客户端中读取数据
