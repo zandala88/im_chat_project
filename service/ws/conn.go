@@ -153,6 +153,7 @@ func (c *Conn) StartWriter() {
 	for {
 		select {
 		case data := <-c.sendCh:
+			zap.S().Debug("StartWriter Send Data: ", data)
 			if err = c.Socket.WriteMessage(websocket.BinaryMessage, data); err != nil {
 				zap.S().Error("Send Data error:, ", err, " Conn Writer exit")
 				return

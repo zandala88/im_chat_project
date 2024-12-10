@@ -30,12 +30,15 @@ func Test_BuildProtocol(t *testing.T) {
 func Test_PushProtocol(t *testing.T) {
 	base64Str := "ChIIBBDIARoHU3VjY2VzcyICCAM="
 	decoded, _ := base64.StdEncoding.DecodeString(base64Str)
+	t.Logf("%q", decoded)
 	output := &Output{}
 	err := proto.Unmarshal(decoded, output)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+	t.Log(output)
+	t.Logf("Unmarshaled Output: %#v", output)
 	t.Log(output.Data)
 	t.Log(output.Code)
 }
