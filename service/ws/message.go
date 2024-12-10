@@ -25,14 +25,14 @@ func GetOutputMsg(cmdType protocol.CmdType, code int32, message proto.Message) (
 		CodeMsg: util.GetErrorMessage(int(code)),
 		Data:    nil,
 	}
-	if message != nil {
-		msgBytes, err := proto.Marshal(message)
-		if err != nil {
-			zap.S().Error("[GetOutputMsg] message marshal err:", err)
-			return nil, err
-		}
-		output.Data = msgBytes
-	}
+	//if message != nil {
+	//	msgBytes, err := proto.Marshal(message)
+	//	if err != nil {
+	//		zap.S().Error("[GetOutputMsg] message marshal err:", err)
+	//		return nil, err
+	//	}
+	//	output.Data = msgBytes
+	//}
 
 	zap.S().Debugf("[GetOutputMsg] output:%#v", output)
 
