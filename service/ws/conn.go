@@ -200,7 +200,7 @@ func (c *Conn) StartWriterWithBuffer() {
 	for {
 		select {
 		case buff := <-c.sendCh:
-			zap.S().Debug("StartWriterWithBuffer Send Data: ", buff)
+			zap.S().Debugf("StartWriterWithBuffer Send Data: %q", buff)
 			buffer.Outputs = append(buffer.Outputs, buff)
 			if len(buffer.Outputs) == bufferLimit {
 				send()
