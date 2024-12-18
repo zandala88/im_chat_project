@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 	"im/public/protocol"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -49,22 +49,12 @@ func (c *Client) Start() {
 	c.conn = conn
 
 	fmt.Println("与 websocket 建立连接")
-	// 向 websocket 发送登录请求
 	c.Login()
-
-	// 心跳
 	go c.Heartbeat()
-
 	time.Sleep(time.Millisecond * 100)
-
-	// 离线消息同步
 	go c.Sync()
-
-	// 收取消息
 	go c.Receive()
-
 	time.Sleep(time.Millisecond * 100)
-
 	c.ReadLine()
 }
 
@@ -119,7 +109,6 @@ func (c *Client) ReadLine() {
 				case <-ticker.C:
 					if retryCount >= maxRetry {
 						fmt.Println("达到最大超时次数，不再重试")
-						// TODO 进行消息发送失败处理
 						return
 					}
 					fmt.Println("消息超时 msg:", msg, "，第", retryCount+1, "次重试")
@@ -138,11 +127,9 @@ func (c *Client) ReadLine() {
 }
 
 func (c *Client) Heartbeat() {
-	//  2min 一次
 	ticker := time.NewTicker(time.Second * 2 * 60)
 	for range ticker.C {
 		c.SendMsg(protocol.CmdType_CT_Heartbeat, &protocol.HeartbeatMsg{})
-		//fmt.Println("发送心跳", time.Now().Format("2006-01-02 15:04:05"))
 	}
 }
 
@@ -313,7 +300,7 @@ func Login() *Client {
 	}
 
 	// 读取返回数据
-	bodyData, err := ioutil.ReadAll(resp.Body)
+	bodyData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}

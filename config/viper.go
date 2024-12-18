@@ -57,7 +57,7 @@ type AppConfig struct {
 }
 
 type ETCDConfig struct {
-	Endpoints  []string // etcd endpoints 列表
+	Endpoints  []string // endpoints 列表
 	Timeout    int      // 超时时间（秒）
 	ServerList string   // 服务列表
 }
@@ -74,7 +74,7 @@ func init() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")
-	err := viper.ReadInConfig() //根据上面配置加载文件
+	err := viper.ReadInConfig() //加载配置文件
 	if err != nil {
 		return
 	}

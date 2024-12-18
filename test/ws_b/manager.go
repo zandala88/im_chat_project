@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spf13/cast"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -184,7 +184,7 @@ func (m *Manager) registerAndCreateGroup() {
 			defer resp.Body.Close()
 
 			// 读取数据，并解析返回值
-			responseBody, err := ioutil.ReadAll(resp.Body)
+			responseBody, err := io.ReadAll(resp.Body)
 			if err != nil {
 				panic(err)
 			}
@@ -239,7 +239,7 @@ func (m *Manager) registerAndCreateGroup() {
 	}
 	defer resp.Body.Close()
 
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
