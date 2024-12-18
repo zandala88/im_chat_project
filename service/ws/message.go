@@ -34,8 +34,6 @@ func GetOutputMsg(cmdType protocol.CmdType, code int32, message proto.Message) (
 		output.Data = msgBytes
 	}
 
-	zap.S().Debugf("[GetOutputMsg] output:%#v", output)
-
 	bytes, err := proto.Marshal(output)
 	if err != nil {
 		zap.S().Error("[GetOutputMsg] output marshal err:", err)
@@ -45,9 +43,6 @@ func GetOutputMsg(cmdType protocol.CmdType, code int32, message proto.Message) (
 	if err := proto.Unmarshal(bytes, &output2); err != nil {
 		zap.S().Errorf("Failed to unmarshal bytes: %v", err)
 	}
-	zap.S().Debugf("Unmarshaled Output: %#v", output2)
-	zap.S().Debugf("[GetOutputMsg] bytes1:%q", bytes)
-	zap.S().Debugf("[GetOutputMsg] bytes2:%x", bytes)
 	return bytes, nil
 }
 

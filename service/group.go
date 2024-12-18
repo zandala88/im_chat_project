@@ -32,19 +32,19 @@ func CreateGroup(c *gin.Context) {
 	}
 
 	// 判断添加的用户是否都是好友
-	userRepo := model.NewUserRepo(c)
+	//userRepo := model.NewUserRepo(c)
 	userId := util.GetUid(c)
-	in, err := userRepo.CheckFriendIn(userId, ids)
-	if err != nil {
-		zap.S().Error("[CreateGroup] [model.CheckFriendIn] [err] = ", err.Error())
-		util.FailRespWithCode(c, util.InternalServerError)
-		return
-	}
-	if !in {
-		zap.S().Error("[CreateGroup] 参数不正确")
-		util.FailRespWithCode(c, util.ShouldBindJSONError)
-		return
-	}
+	//in, err := userRepo.CheckFriendIn(userId, ids)
+	//if err != nil {
+	//	zap.S().Error("[CreateGroup] [model.CheckFriendIn] [err] = ", err.Error())
+	//	util.FailRespWithCode(c, util.InternalServerError)
+	//	return
+	//}
+	//if !in {
+	//	zap.S().Error("[CreateGroup] 参数不正确")
+	//	util.FailRespWithCode(c, util.ShouldBindJSONError)
+	//	return
+	//}
 
 	ids = append(ids, userId)
 	// 创建群组
@@ -53,7 +53,7 @@ func CreateGroup(c *gin.Context) {
 		OwnerID: userId,
 	}
 	groupRepo := model.NewGroupRepo(c)
-	err = groupRepo.CreateGroup(group, ids)
+	err := groupRepo.CreateGroup(group, ids)
 	if err != nil {
 		zap.S().Error("[CreateGroup] [model.CreateGroup] [err] = ", err.Error())
 		util.FailRespWithCode(c, util.InternalServerError)
