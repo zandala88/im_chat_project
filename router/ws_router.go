@@ -40,7 +40,9 @@ func WSRouter() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	pprof.Register(r)
+	pprofRouter := gin.New()
+	pprof.Register(pprofRouter)
+	r.Any("/debug/pprof/*any", gin.WrapH(pprofRouter))
 	var connID int64
 
 	r.GET("/ws", func(c *gin.Context) {
