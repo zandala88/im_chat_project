@@ -4,11 +4,12 @@ import (
 	"encoding/base64"
 	"google.golang.org/protobuf/proto"
 	"testing"
+	"time"
 )
 
 func Test_BuildProtocol(t *testing.T) {
 	loginMsg := &LoginMsg{
-		Token: []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3MzYzMzA1NTIsImlzcyI6InphbmRhbGEifQ.Sr-69_uaJ6IptxYE0PDaiDqXW8uXW6DvzHNjBhUF40I"),
+		Token: []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3MzcwMTM2OTEsImlzcyI6InphbmRhbGEifQ.KlHtkxoDSI9tsNW1kb96GvpIweXwaLaQdNuh26sw8JE"),
 	}
 	tmp, _ := proto.Marshal(loginMsg)
 
@@ -27,8 +28,39 @@ func Test_BuildProtocol(t *testing.T) {
 	t.Log(base64Str)
 }
 
+func Test_SaveMsg(t *testing.T) {
+	msg := &UpMsg{
+		ClientId: 1,
+		Msg: &Message{
+			SessionType: 1,
+			ReceiverId:  2,
+			SenderId:    3,
+			MessageType: 1,
+			Content:     []byte("hello"),
+			Seq:         1,
+			SendTime:    time.Now().Unix(),
+		},
+	}
+
+	tmp, _ := proto.Marshal(msg)
+
+	input := &Input{
+		Type: CmdType_CT_Message,
+		Data: tmp,
+	}
+	marshal, err := proto.Marshal(input)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	// 将二进制数据编码为 Base64
+	base64Str := base64.StdEncoding.EncodeToString(marshal)
+	t.Log(base64Str)
+}
+
 func Test_PushProtocol(t *testing.T) {
-	base64Str := "ChIIBBDIARoHU3VjY2VzcyICCAM="
+	base64Str := "CAQQyAEaB1N1Y2Nlc3MiBggBEAEYAQ=="
 	decoded, _ := base64.StdEncoding.DecodeString(base64Str)
 	t.Logf("%q", decoded)
 	output := &Output{}
@@ -41,4 +73,18 @@ func Test_PushProtocol(t *testing.T) {
 	t.Logf("Unmarshaled Output: %#v", output)
 	t.Log(output.Data)
 	t.Log(output.Code)
+}
+
+func Test_PushProtocol2(t *testing.T) {
+	base64Str := "CAM="
+	decoded, _ := base64.StdEncoding.DecodeString(base64Str)
+	output := &ACKMsg{}
+	err := proto.Unmarshal(decoded, output)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(output)
+	t.Log(output.ClientId)
+	t.Log(output.Seq)
 }
