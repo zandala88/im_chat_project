@@ -70,6 +70,7 @@ func MessageToProtoMarshal(messages ...*Message) []byte {
 			Seq:         message.Seq,
 			SendTime:    timestamppb.New(message.SendTime),
 		})
+		zap.S().Debug("[Message] [MessageToProtoMarshal] [mqMessage] Time = ", timestamppb.New(message.SendTime))
 	}
 	bytes, err := proto.Marshal(&protocol.MQMessages{Messages: mqMessage})
 	if err != nil {
