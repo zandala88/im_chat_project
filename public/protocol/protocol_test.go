@@ -88,3 +88,38 @@ func Test_PushProtocol2(t *testing.T) {
 	t.Log(output.ClientId)
 	t.Log(output.Seq)
 }
+
+func Test_PushProtocol3(t *testing.T) {
+	base64Str := "CAMSIQodCAEQAhjIAyABKgQxMTExMNmzj7++MjjZs4+/vjIQAQ=="
+	decoded, _ := base64.StdEncoding.DecodeString(base64Str)
+	output := &Input{}
+	err := proto.Unmarshal(decoded, output)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(output)
+	t.Log(output.Type)
+	t.Logf("%#v", output.Data)
+	output2 := &UpMsg{}
+	err = proto.Unmarshal(output.Data, output2)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(output2)
+}
+
+func Test_PushProtocol4(t *testing.T) {
+	base64Str := "Cg0IARACGAMgASoBMTAC"
+	decoded, _ := base64.StdEncoding.DecodeString(base64Str)
+	output := &SyncOutputMsg{}
+	err := proto.Unmarshal(decoded, output)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(output)
+	t.Log(output.Messages)
+	t.Log(output.HasMore)
+}
